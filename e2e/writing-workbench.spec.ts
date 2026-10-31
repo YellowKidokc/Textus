@@ -91,14 +91,14 @@ async function model(page: Page, delayed = false, failure = false) {
       const w = window as any;
       const original = w.__TAURI_INTERNALS__.invoke;
       w.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
-        if (cmd !== "ai_agent_message") return original(cmd, args);
+        if (cmd !== "ai_plugin_request") return original(cmd, args);
         w.__writingRequests = (w.__writingRequests || 0) + 1;
         if (failure) throw new Error("Test provider unavailable");
         const payload = JSON.parse(
-          args.message.slice(args.message.lastIndexOf("\n") + 1),
+          args.prompt.slice(args.prompt.lastIndexOf("\n") + 1),
         );
         let result;
-        if (args.message.startsWith("Analyze writing")) {
+        if (args.prompt.startsWith("Analyze writing")) {
           const block = payload.blocks.find((b: any) =>
             b.plan.intentions.some((i: any) => i.component === "story:S04"),
           );
@@ -127,7 +127,11 @@ async function model(page: Page, delayed = false, failure = false) {
             reason: "Uses fewer words without adding facts.",
           };
         if (delayed) await new Promise((resolve) => setTimeout(resolve, 1500));
-        return [{ kind: "Assistant", text: JSON.stringify(result) }];
+        return {
+          text: JSON.stringify(result),
+          outputLimitEnforced: false,
+          usage: null,
+        };
       };
     },
     { delayed, failure },
@@ -347,24 +351,24 @@ test("local rubric workshop, explicit priced review, and durable cached results"
     const invoke = w.__TAURI_INTERNALS__.invoke;
     w.__rubricCalls = 0;
     w.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
-      if (cmd !== "ai_agent_message") return invoke(cmd, args);
+      if (cmd !== "ai_plugin_request") return invoke(cmd, args);
       w.__rubricCalls++;
-      return [
-        {
-          kind: "Assistant",
-          text: JSON.stringify({
-            results: [
-              {
-                criterion: "criterion-1",
-                score: null,
-                quote: "Imagine a bridge",
-                explanation: "A concrete opening.",
-                uncertainty: "A short sample.",
-              },
-            ],
-          }),
-        },
-      ];
+      w.__rubricRequest = args;
+      return {
+        outputLimitEnforced: false,
+        usage: null,
+        text: JSON.stringify({
+          results: [
+            {
+              criterion: "criterion-1",
+              score: null,
+              quote: "Imagine a bridge",
+              explanation: "A concrete opening.",
+              uncertainty: "A short sample.",
+            },
+          ],
+        }),
+      };
     };
   });
   await plan
@@ -406,9 +410,29 @@ test("local rubric workshop, explicit priced review, and durable cached results"
   await notes.locator("#outputRate").fill("2");
   await notes.getByRole("button", { name: "Estimate cost" }).click();
   await expect(notes.locator("#estimate")).toContainText("USD");
+  // The preview names the cap as only asked for, and shows the whole request.
+  await expect(notes.locator("#estimate")).toContainText(
+    "asked for in the prompt only",
+  );
+  await expect(notes.locator("#manifestContext")).toContainText(
+    "No project instructions, library, style profile, memories",
+  );
+  const shown = await notes.locator("#manifestText").textContent();
   await notes.getByRole("button", { name: "Run assessment" }).click();
   await expect(notes.locator("#assessments summary")).toHaveCount(1);
   expect(await page.evaluate(() => (window as any).__rubricCalls)).toBe(1);
+  // Run sent what the preview showed, and nothing else.
+  const sent = await page.evaluate(() => (window as any).__rubricRequest);
+  expect(sent.instructions + "\n\n" + sent.prompt).toBe(shown);
+  expect(sent.maxOutputTokens).toBe(1500);
+  expect(Object.keys(sent).sort()).toEqual([
+    "instructions",
+    "maxOutputTokens",
+    "model",
+    "prompt",
+    "provider",
+    "requestId",
+  ]);
   await notes.getByRole("button", { name: "Run assessment" }).click();
   await expect(notes.locator("#reviewMessage")).toContainText("No API request");
   expect(await page.evaluate(() => (window as any).__rubricCalls)).toBe(1);
@@ -462,37 +486,34 @@ test("frozen original stays unchanged while paragraph rewrites target the separa
     const w = window as any,
       invoke = w.__TAURI_INTERNALS__.invoke;
     w.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
-      if (cmd !== "ai_agent_message") return invoke(cmd, args);
-      w.__rewriteTarget = args.docPath;
-      if (args.message.startsWith("Inspect this paragraph"))
-        return [
-          {
-            kind: "Assistant",
-            text: JSON.stringify({
-              notes: [
-                {
-                  category: "USED",
-                  quote: "Imagine a bridge",
-                  explanation: "An imagined constraint illustrates the point.",
-                  uncertainty: "It is not evidence.",
-                },
-              ],
-            }),
-          },
-        ];
-      return [
-        {
-          kind: "Assistant",
+      if (cmd !== "ai_plugin_request") return invoke(cmd, args);
+      if (args.prompt.startsWith("Inspect this paragraph"))
+        return {
+          outputLimitEnforced: false,
+          usage: null,
           text: JSON.stringify({
-            alternatives: [
+            notes: [
               {
-                text: "Imagine a bridge with room for one person.",
-                reason: "Uses fewer words.",
+                category: "USED",
+                quote: "Imagine a bridge",
+                explanation: "An imagined constraint illustrates the point.",
+                uncertainty: "It is not evidence.",
               },
             ],
           }),
-        },
-      ];
+        };
+      return {
+        outputLimitEnforced: false,
+        usage: null,
+        text: JSON.stringify({
+          alternatives: [
+            {
+              text: "Imagine a bridge with room for one person.",
+              reason: "Uses fewer words.",
+            },
+          ],
+        }),
+      };
     };
   });
   await notes
@@ -508,9 +529,21 @@ test("frozen original stays unchanged while paragraph rewrites target the separa
     .getByRole("button", { name: "Rewrite paragraph", exact: true })
     .click();
   await expect(notes.locator("#proposals summary")).toHaveCount(1);
-  expect(await page.evaluate(() => (window as any).__rewriteTarget)).toMatch(
-    /^\/work\/revision-/,
-  );
+  // The request is about the working revision, never the frozen original or
+  // the source file: the proposal it saved names the revision.
+  const targets = await page.evaluate(() => {
+    const found: string[] = [];
+    const walk = (v: any) => {
+      if (!v || typeof v !== "object") return;
+      if (Array.isArray(v.passageProposals))
+        for (const p of v.passageProposals) found.push(p.document);
+      Object.values(v).forEach(walk);
+    };
+    walk((window as any).__devPluginStore);
+    return found;
+  });
+  expect(targets).toHaveLength(1);
+  expect(targets[0]).toMatch(/^\/work\/revision-/);
   await notes.locator("#proposals summary").click();
   await notes.getByRole("button", { name: "Send to native review" }).click();
   await expect(
@@ -529,9 +562,7 @@ test("frozen original stays unchanged while paragraph rewrites target the separa
   expect(
     await page.evaluate(() => (window as any).__devFs["/work/paper.md"]),
   ).toContain("Imagine a bridge that can carry only one person at a time.");
-  const revisionPath = await page.evaluate(
-    () => (window as any).__rewriteTarget,
-  );
+  const revisionPath = targets[0];
   await emit(page, "menu-save-file");
   await page.evaluate(() => {
     const w = window as any;

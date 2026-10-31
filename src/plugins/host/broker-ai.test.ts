@@ -8,14 +8,14 @@ const mocks = vi.hoisted(() => ({
   target: vi.fn(),
 }));
 vi.mock("../../platform/ipc", () => ({
-  ai: { agentMessage: mocks.agent, cancelAgentMessage: mocks.cancel },
+  ai: { pluginRequest: mocks.agent, cancelAgentMessage: mocks.cancel },
 }));
 vi.mock("../../prefs/settings-store", () => ({ loadSettings: mocks.settings }));
 vi.mock("../app-bridge", () => ({
   getActiveDocument: mocks.active,
   getDocumentAccess: mocks.target,
 }));
-import { aiHandlers, stopPluginAi } from "./broker-ai";
+import { aiHandlers, PLUGIN_INSTRUCTIONS, stopPluginAi } from "./broker-ai";
 
 function scope(allowed = true): PluginScope {
   return {
@@ -27,7 +27,11 @@ function scope(allowed = true): PluginScope {
 }
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.agent.mockResolvedValue([{ kind: "Assistant", text: "result" }]);
+  mocks.agent.mockResolvedValue({
+    text: "result",
+    outputLimitEnforced: false,
+    usage: null,
+  });
   mocks.cancel.mockResolvedValue(undefined);
   mocks.active.mockReturnValue({ path: "/notes/paper.md" });
   mocks.settings.mockReturnValue({
@@ -37,11 +41,7 @@ beforeEach(() => {
   });
 });
 describe("permissioned plugin provider bridge", () => {
-  it("reuses the selected provider and project, tags the version, and never returns tool proposals or credentials", async () => {
-    mocks.agent.mockResolvedValue([
-      { kind: "ToolCall", name: "propose_edit", arguments: "PRIVATE" },
-      { kind: "Assistant", text: "result" },
-    ]);
+  it("sends only the fixed instructions and the prompt, with the selected provider, and returns no credentials", async () => {
     const result = await aiHandlers(scope())["ai.request"]({
       id: "client",
       prompt: "Analyze",
@@ -53,17 +53,81 @@ describe("permissioned plugin provider bridge", () => {
       model: "chosen-model",
       version: "version-1",
       docPath: "/notes/paper.md",
+      outputLimit: "none",
+      usage: null,
+    });
+    // No project folder, document, history or tools reach the backend.
+    expect(mocks.agent).toHaveBeenCalledWith({
+      provider: "configured-provider",
+      model: "chosen-model",
+      instructions: PLUGIN_INSTRUCTIONS,
+      prompt: "Analyze",
+      maxOutputTokens: null,
+      requestId: expect.stringMatching(/^plugin-/),
+    });
+  });
+  it("previews exactly what the request sends, without a backend call", async () => {
+    const h = aiHandlers(scope());
+    const manifest = h["ai.prepare"]({
+      prompt: "Assess",
+      maxOutputTokens: 900,
+    });
+    expect(manifest).toEqual({
+      provider: "configured-provider",
+      model: "chosen-model",
+      document: "/notes/paper.md",
+      instructions: PLUGIN_INSTRUCTIONS,
+      prompt: "Assess",
+      sources: [],
+      inputCharacters: PLUGIN_INSTRUCTIONS.length + "Assess".length,
+      maxOutputTokens: 900,
+      outputLimit: "requested",
+    });
+    expect(mocks.agent).not.toHaveBeenCalled();
+    await h["ai.request"]({
+      id: "r",
+      version: "v",
+      prompt: "Assess",
+      maxOutputTokens: 900,
     });
     expect(mocks.agent).toHaveBeenCalledWith(
       expect.objectContaining({
-        provider: "configured-provider",
-        model: "chosen-model",
-        workspaceRoot: "/notes",
-        mode: "review",
-        textOnly: true,
-        webSearch: false,
-        blocks: [],
+        instructions: manifest.instructions,
+        prompt: manifest.prompt,
+        maxOutputTokens: manifest.maxOutputTokens,
       }),
+    );
+  });
+  it("tells an enforced output cap from a requested one, and returns reported usage", async () => {
+    mocks.settings.mockReturnValue({
+      aiProvider: "anthropic",
+      agentModels: {},
+      agentWorkspaceRoot: "",
+    });
+    const h = aiHandlers(scope());
+    expect(
+      h["ai.prepare"]({ prompt: "x", maxOutputTokens: 500 }).outputLimit,
+    ).toBe("enforced");
+    const usage = {
+      inputTokens: 40,
+      outputTokens: 12,
+      cacheReadInputTokens: 0,
+      cacheCreationInputTokens: 0,
+    };
+    mocks.agent.mockResolvedValue({
+      text: "ok",
+      outputLimitEnforced: true,
+      usage,
+    });
+    const reply = await h["ai.request"]({
+      id: "e",
+      version: "v",
+      prompt: "x",
+      maxOutputTokens: 500,
+    });
+    expect(reply).toMatchObject({ outputLimit: "enforced", usage });
+    expect(() => h["ai.prepare"]({ prompt: "x", maxOutputTokens: 0 })).toThrow(
+      /maxOutputTokens/,
     );
   });
   it("refuses missing permission before invoking the backend", async () => {

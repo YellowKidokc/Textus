@@ -7,8 +7,10 @@ use tauri::AppHandle;
 
 mod completion;
 mod grammar;
+mod plugin;
 pub(crate) use completion::*;
 pub(crate) use grammar::*;
+pub(crate) use plugin::*;
 
 /// `model` overrides the provider's default model; inline completion always
 /// passes `None`. Dispatches by dialect.

@@ -880,6 +880,9 @@
       info: function () {
         return call("ai.info");
       },
+      prepare: function (options) {
+        return call("ai.prepare", plain(options));
+      },
       request: function (options) {
         return call("ai.request", plain(options));
       },

@@ -130,6 +130,11 @@
       <p data-t="estimateHelp" class="muted"></p>
       <div id="reviewActions" class="row"></div>
       <p id="estimate" role="status"></p>
+      <details id="manifest" hidden>
+        <summary data-t="requestSent"></summary>
+        <p id="manifestContext" class="muted"></p>
+        <pre id="manifestText"></pre>
+      </details>
       <p id="reviewMessage"></p>
       <div id="assessments"></div>
     </section>
@@ -481,6 +486,22 @@
         $("estimate").textContent = r.preview
           ? `${r.preview.provider} / ${r.preview.model || ""} · ${t("approximateTokens")}: ${r.preview.inputTokens} + ${r.preview.outputTokens} · ${r.preview.usd === null ? t("unknownCost") : "USD " + r.preview.usd.toFixed(5)}`
           : t("estimateFirst");
+        // The preview is the request Run sends, shown whole.
+        $("manifest").hidden = !r.preview;
+        if (r.preview) {
+          $("estimate").textContent +=
+            " · " +
+            t(
+              r.preview.outputLimit === "enforced"
+                ? "outputLimitEnforced"
+                : "outputLimitRequested",
+            );
+          $("manifestContext").textContent = r.preview.sources.length
+            ? r.preview.sources.join(", ")
+            : t("noOtherContext");
+          $("manifestText").textContent =
+            r.preview.instructions + "\n\n" + r.preview.prompt;
+        }
         $("reviewMessage").textContent = r.message;
         const assessments = $("assessments");
         assessments.replaceChildren();
@@ -505,7 +526,10 @@
                 " · " +
                 a.at +
                 " · " +
-                a.version,
+                a.version +
+                (a.usage
+                  ? ` · ${t("reportedTokens")}: ${a.usage.inputTokens} + ${a.usage.outputTokens}`
+                  : ""),
               "muted",
             ),
           );

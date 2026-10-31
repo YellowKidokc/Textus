@@ -29,7 +29,9 @@ mod window_frame;
 
 use ai::agent::ai_agent_message;
 use ai::cancel::ai_cancel;
-use ai::client::{ai_complete, ai_grammar_check, fetch_agent_models, set_ai_proxy};
+use ai::client::{
+    ai_complete, ai_grammar_check, ai_plugin_request, fetch_agent_models, set_ai_proxy,
+};
 use auth::claude::{claude_auth_status, claude_login, claude_logout};
 use auth::custom_endpoint::{
     clear_custom_endpoint, custom_endpoint_status, fetch_custom_models, set_custom_endpoint,
@@ -283,6 +285,7 @@ pub fn run() {
             claude_logout,
             ai_complete,
             ai_grammar_check,
+            ai_plugin_request,
             ai_agent_message,
             ai_cancel,
             fetch_agent_models,

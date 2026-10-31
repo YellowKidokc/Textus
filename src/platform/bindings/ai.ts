@@ -155,6 +155,65 @@ export type GrammarRequest_Serialize = {
 	uiLanguage: string | null,
 };
 
+export type PluginReply = PluginReply_Serialize | PluginReply_Deserialize;
+
+export type PluginReply_Deserialize = {
+	text: string,
+	/**  Whether the provider held the reply to max_output_tokens. */
+	outputLimitEnforced: boolean,
+	/**  None where the single call doesn't return usage. */
+	usage?: PluginUsage | null,
+};
+
+export type PluginReply_Serialize = {
+	text: string,
+	/**  Whether the provider held the reply to max_output_tokens. */
+	outputLimitEnforced: boolean,
+	/**  None where the single call doesn't return usage. */
+	usage: PluginUsage | null,
+};
+
+/**  ai_plugin_request's inputs, generated into the bindings to type that call. */
+export type PluginRequest = PluginRequest_Serialize | PluginRequest_Deserialize;
+
+/**  ai_plugin_request's inputs, generated into the bindings to type that call. */
+export type PluginRequest_Deserialize = {
+	provider: string,
+	model?: string | null,
+	instructions: string,
+	prompt: string,
+	/**
+	 *  The reply's cap: enforced where the provider's single call takes one
+	 *  (`enforces_output_limit`), asked for in the prompt elsewhere.
+	 */
+	maxOutputTokens?: number | null,
+	/**  For ai_cancel. */
+	requestId: string,
+};
+
+/**  ai_plugin_request's inputs, generated into the bindings to type that call. */
+export type PluginRequest_Serialize = {
+	provider: string,
+	model: string | null,
+	instructions: string,
+	prompt: string,
+	/**
+	 *  The reply's cap: enforced where the provider's single call takes one
+	 *  (`enforces_output_limit`), asked for in the prompt elsewhere.
+	 */
+	maxOutputTokens: number | null,
+	/**  For ai_cancel. */
+	requestId: string,
+};
+
+/**  Token counts as the provider reported them. */
+export type PluginUsage = {
+	inputTokens: number,
+	outputTokens: number,
+	cacheReadInputTokens: number,
+	cacheCreationInputTokens: number,
+};
+
 export type ProviderCatalogEntry = ProviderCatalogEntry_Serialize | ProviderCatalogEntry_Deserialize;
 
 export type ProviderCatalogEntry_Deserialize = {
