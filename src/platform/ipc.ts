@@ -218,6 +218,8 @@ export const ai = {
     /** What web_search uses when the model can't search by itself. */
     searchService?: string;
     searxngUrl?: string;
+    /** Disable all backend tools; mirrors text_only in src-tauri/src/ai/agent/mod.rs. */
+    textOnly?: boolean;
     mode: AgentMode;
     model: string | null;
     requestId: string;

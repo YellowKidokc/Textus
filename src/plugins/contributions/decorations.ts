@@ -15,7 +15,10 @@ export interface PluginDecoration {
   before?: boolean;
 }
 
-type Ask = (blocks: SentBlock[]) => Promise<PluginDecoration[]>;
+type Ask = (
+  blocks: SentBlock[],
+  document?: string | null,
+) => Promise<PluginDecoration[]>;
 
 const providers = new Map<string, Ask>();
 const listeners = new Set<() => void>();
@@ -48,11 +51,12 @@ export function onDecorationProviders(listener: () => void): () => void {
 export async function decorate(
   blocks: SentBlock[],
   timeoutMs = 1500,
+  document?: string | null,
 ): Promise<(PluginDecoration & { plugin: string })[]> {
   const all = await Promise.all(
     [...providers].map(async ([plugin, ask]) => {
       const marks = await Promise.race([
-        ask(blocks).catch(() => []),
+        ask(blocks, document).catch(() => []),
         new Promise<PluginDecoration[]>((resolve) =>
           setTimeout(() => resolve([]), timeoutMs),
         ),

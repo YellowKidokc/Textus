@@ -60,6 +60,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist/**",
+      "dist-workbench/**",
       "dist-playground/**",
       "node_modules/**",
       "src-tauri/target/**",

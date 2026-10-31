@@ -39,6 +39,7 @@ export interface PluginTabInfo {
 
 /** The document in front, as its editor reads it. */
 export interface ActiveDocumentAccess {
+  paragraph?(): SentBlock | null;
   path: string | null;
   text(): string;
   /** Its blocks as Textus AI is shown them: what an edit names by `block`. */
@@ -81,6 +82,9 @@ export interface PluginTabView {
 }
 
 export interface WindowAccess {
+  openComparison(
+    request: ComparisonOpen,
+  ): Promise<{ original: string; revision: string }>;
   /** The folder the sidebar shows, if any. */
   rootPath(): string | null;
   /** Opens a file in a tab - `where` it says - at `place` if given;
@@ -101,6 +105,30 @@ export interface WindowAccess {
   /** The window's tabs, and the one in front. */
   tabs(): PluginTabInfo[];
   activeTab(): PluginTabInfo | null;
+}
+
+export interface ComparisonOpen {
+  id: string;
+  originalText: string;
+  originalTitle: string;
+  originalVersion: string;
+  revisionPath: string;
+  revisionTitle: string;
+  ratio: number;
+}
+
+const documentAccess = new Map<string, ActiveDocumentAccess>();
+export function registerDocumentAccess(
+  key: string,
+  access: ActiveDocumentAccess,
+): () => void {
+  documentAccess.set(key, access);
+  return () => {
+    if (documentAccess.get(key) === access) documentAccess.delete(key);
+  };
+}
+export function getDocumentAccess(key: string): ActiveDocumentAccess | null {
+  return documentAccess.get(key) ?? null;
 }
 
 let activeDocument: ActiveDocumentAccess | null = null;

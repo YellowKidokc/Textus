@@ -1458,6 +1458,11 @@ ${AI_NAME}에게 주는 글쓰기 지침으로, 모든 문서에 적용됩니다
   pluginStoppedAnswering: "응답하지 않음",
   pluginTooManyErrors: "오류가 너무 많음",
   pluginQuickPickEmpty: "일치하는 항목이 없습니다.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "현재 문서와 선택한 내용 읽기",
   pluginPermEditorWrite:
     "열려 있는 문서를 바로 고칩니다(고친 내용은 되돌릴 수 있음)",
@@ -1468,6 +1473,8 @@ ${AI_NAME}에게 주는 글쓰기 지침으로, 모든 문서에 적용됩니다
   pluginPermEditorInput: "편집기에서 누르는 키를 넘겨받아, 누른 대로 편집",
   pluginPermProjectData:
     "열려 있는 폴더(.textus/plugins)에 자체 데이터를 저장하기",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Textus AI에 자체 도구를 제공하기",
   pluginPermNotifications: "시스템 알림 표시하기",
   pluginPermBackground: "일정에 따라 코드 실행하기(모든 창을 닫아도)",

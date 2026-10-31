@@ -92,8 +92,10 @@
               "clipboard",
               "project.data",
               "ai.tools",
+              "ai.request",
               "notifications",
-              "background"
+              "background",
+              "editor.targets"
             ]
           },
           {
@@ -134,7 +136,7 @@
               },
               "runs": {
                 "type": "object",
-                "description": "Runs one of Textus's commands (\"textus.…\") with these arguments, at once and with no code of the plugin's - for a / item or a key that must act before the next key comes. Textus 1.3.0-beta.8.",
+                "description": "Runs one of Textus's commands (\"textus.\u2026\") with these arguments, at once and with no code of the plugin's - for a / item or a key that must act before the next key comes. Textus 1.3.0-beta.8.",
                 "required": ["command"],
                 "additionalProperties": false,
                 "properties": {
@@ -218,6 +220,10 @@
               "type": {
                 "enum": ["webview", "list"],
                 "description": "list: drawn by Textus from views.registerList's items; webview (the default): a page of the plugin's"
+              },
+              "side": {
+                "enum": ["left", "right"],
+                "description": "1.3: left plan rail (default), or the right inspector beside AI conversation."
               }
             }
           }

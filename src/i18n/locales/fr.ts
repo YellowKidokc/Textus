@@ -1566,6 +1566,11 @@ utiliser une.
   pluginStoppedAnswering: "elle ne répondait plus",
   pluginTooManyErrors: "elle a échoué trop souvent",
   pluginQuickPickEmpty: "Aucun résultat.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "Lire le document affiché et sa sélection",
   pluginPermEditorWrite:
     "Modifier directement le document ouvert (chaque modification peut être annulée)",
@@ -1578,6 +1583,8 @@ utiliser une.
     "Prendre en charge les touches tapées dans l’éditeur, et modifier au fil de la frappe",
   pluginPermProjectData:
     "Garder ses propres données dans le dossier ouvert, dans .textus/plugins",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Donner à Textus AI ses propres outils",
   pluginPermNotifications: "Afficher des notifications système",
   pluginPermBackground:

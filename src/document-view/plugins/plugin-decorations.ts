@@ -28,78 +28,81 @@ const AROUND = 10;
  * the document rests, and their answers are drawn. Nothing runs while no
  * plugin marks.
  */
-export const pluginDecorations = $prose((ctx) => {
-  return new Plugin<DecorationSet>({
-    key,
-    state: {
-      init: () => DecorationSet.empty,
-      apply(tr, prev) {
-        const next = tr.getMeta(key) as DecorationSet | undefined;
-        return next ?? prev.map(tr.mapping, tr.doc);
+export const pluginDecorations = (docPath: {
+  readonly current: string | null;
+}) =>
+  $prose((ctx) => {
+    return new Plugin<DecorationSet>({
+      key,
+      state: {
+        init: () => DecorationSet.empty,
+        apply(tr, prev) {
+          const next = tr.getMeta(key) as DecorationSet | undefined;
+          return next ?? prev.map(tr.mapping, tr.doc);
+        },
       },
-    },
-    props: {
-      decorations: (state) => key.getState(state),
-    },
-    view(view) {
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      let asked = 0;
-      const ask = () => {
-        clearTimeout(timer);
-        timer = setTimeout(() => void run(), ASK_MS);
-      };
-      const run = async () => {
-        const turn = ++asked;
-        if (!hasDecorationProviders()) {
-          if (key.getState(view.state) !== DecorationSet.empty)
-            view.dispatch(view.state.tr.setMeta(key, DecorationSet.empty));
-          return;
-        }
-        const doc = view.state.doc;
-        const all = cachedDocument(ctx, doc).blocks;
-        const [first, last] = inSight(view);
-        const sent = all.slice(
-          Math.max(0, first - AROUND),
-          Math.min(all.length, last + AROUND + 1),
-        );
-        const marks = await decorate(sent);
-        // Asked again meanwhile, or the text moved on: that answer wins.
-        if (turn !== asked || view.isDestroyed) return;
-        if (view.state.doc !== doc) {
-          ask();
-          return;
-        }
-        const starts: number[] = [];
-        doc.forEach((_node, pos) => starts.push(pos));
-        const index = new Map(all.map((b, i) => [b.id, i]));
-        const out: Decoration[] = [];
-        for (const mark of marks) {
-          const i = index.get(mark.block);
-          if (i === undefined) continue;
-          out.push(...drawMark(doc.child(i), starts[i], mark));
-        }
-        view.dispatch(
-          view.state.tr.setMeta(key, DecorationSet.create(doc, out)),
-        );
-      };
-      const scroller = view.dom.closest(".editor-scroll");
-      scroller?.addEventListener("scroll", ask, { passive: true });
-      const stop = onDecorationProviders(ask);
-      ask();
-      return {
-        update(_view, prevState) {
-          if (prevState.doc !== view.state.doc && hasDecorationProviders())
-            ask();
-        },
-        destroy() {
+      props: {
+        decorations: (state) => key.getState(state),
+      },
+      view(view) {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        let asked = 0;
+        const ask = () => {
           clearTimeout(timer);
-          stop();
-          scroller?.removeEventListener("scroll", ask);
-        },
-      };
-    },
+          timer = setTimeout(() => void run(), ASK_MS);
+        };
+        const run = async () => {
+          const turn = ++asked;
+          if (!hasDecorationProviders()) {
+            if (key.getState(view.state) !== DecorationSet.empty)
+              view.dispatch(view.state.tr.setMeta(key, DecorationSet.empty));
+            return;
+          }
+          const doc = view.state.doc;
+          const all = cachedDocument(ctx, doc).blocks;
+          const [first, last] = inSight(view);
+          const sent = all.slice(
+            Math.max(0, first - AROUND),
+            Math.min(all.length, last + AROUND + 1),
+          );
+          const marks = await decorate(sent, 1500, docPath.current);
+          // Asked again meanwhile, or the text moved on: that answer wins.
+          if (turn !== asked || view.isDestroyed) return;
+          if (view.state.doc !== doc) {
+            ask();
+            return;
+          }
+          const starts: number[] = [];
+          doc.forEach((_node, pos) => starts.push(pos));
+          const index = new Map(all.map((b, i) => [b.id, i]));
+          const out: Decoration[] = [];
+          for (const mark of marks) {
+            const i = index.get(mark.block);
+            if (i === undefined) continue;
+            out.push(...drawMark(doc.child(i), starts[i], mark));
+          }
+          view.dispatch(
+            view.state.tr.setMeta(key, DecorationSet.create(doc, out)),
+          );
+        };
+        const scroller = view.dom.closest(".editor-scroll");
+        scroller?.addEventListener("scroll", ask, { passive: true });
+        const stop = onDecorationProviders(ask);
+        ask();
+        return {
+          update(_view, prevState) {
+            if (prevState.doc !== view.state.doc && hasDecorationProviders())
+              ask();
+          },
+          destroy() {
+            clearTimeout(timer);
+            stop();
+            scroller?.removeEventListener("scroll", ask);
+          },
+        };
+      },
+    });
   });
-});
 
 /** The first and last top-level block in sight. */
 function inSight(view: EditorView): [number, number] {

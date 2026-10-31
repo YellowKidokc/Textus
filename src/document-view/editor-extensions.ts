@@ -45,5 +45,5 @@ export function withEditorExtensions(
     { settings, docPath, pendingEdits, quickAskWidget, tour, reviewNotes },
   )
     .use(pluginCodeBlocks(docPath))
-    .use(pluginDecorations);
+    .use(pluginDecorations(docPath));
 }

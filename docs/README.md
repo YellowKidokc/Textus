@@ -35,6 +35,7 @@ where the project is heading.
 | [ai-agent.md](design/ai-agent.md)                | One AI request from start to end: providers, the agent loop, tools, rules for every model |
 | [ai-concepts.md](design/ai-concepts.md)          | The AI concepts: project folder, style profile, library, writing rules, skills, priority |
 | [ai-proposals.md](design/ai-proposals.md)        | An AI edit's life from streaming to the document, and the three chat surfaces            |
+| [workbench-connections.md](design/workbench-connections.md) | Proposed Connections, Evidence and Runs wireframes, context permissions and workflow priorities |
 | [ai-eval.md](design/ai-eval.md)                  | Evaluating the AI features against real providers                                       |
 
 ## Other

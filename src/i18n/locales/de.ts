@@ -1532,6 +1532,11 @@ Skills liegen im Ordner skills/ neben dieser Datei, je Skill eine
   pluginStoppedAnswering: "es antwortete nicht mehr",
   pluginTooManyErrors: "es ist zu oft fehlgeschlagen",
   pluginQuickPickEmpty: "Keine Treffer.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "Das angezeigte Dokument und seine Auswahl lesen",
   pluginPermEditorWrite:
     "Das geöffnete Dokument direkt ändern (jede Änderung lässt sich rückgängig machen)",
@@ -1544,6 +1549,8 @@ Skills liegen im Ordner skills/ neben dieser Datei, je Skill eine
     "Die Tasten im Editor übernehmen und beim Tippen bearbeiten",
   pluginPermProjectData:
     "Eigene Daten im geöffneten Ordner ablegen, unter .textus/plugins",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Textus AI eigene Werkzeuge geben",
   pluginPermNotifications: "Systemmitteilungen anzeigen",
   pluginPermBackground:

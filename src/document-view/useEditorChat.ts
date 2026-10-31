@@ -39,6 +39,7 @@ export function useEditorChat({
     workspaceRoot: settings.agentWorkspaceRoot || null,
   });
   const proposals = useEditorProposals({
+    tabId: setup.tabId,
     run,
     pendingEditActionsRef: setup.pendingEditActionsRef,
     settingsRef: setup.settingsRef,

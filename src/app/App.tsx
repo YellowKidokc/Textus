@@ -34,6 +34,8 @@ import { NoticeHost } from "../ui/notices";
 import "../plugins/plugins.css";
 import "./App.css";
 import { ReportProblemHost } from "./report/ReportProblem";
+import { useEffect } from "react";
+import { FOCUS_WRITING } from "./inspector-tabs";
 
 /**
  * One window: its tabs, the panels around them, and the prompts and notices
@@ -68,6 +70,12 @@ function App() {
   const { menuChecks, sidebarLesson, entryMoved, skillFilesDeleted } = wiring;
   const { documentsOpen, setDocumentsOpen, openFromDocuments } = wiring;
   const { documentRenamed, documentDeleted } = wiring;
+  useEffect(() => {
+    const focus = (event: Event) =>
+      setZenMode((event as CustomEvent).detail === true);
+    window.addEventListener(FOCUS_WRITING, focus);
+    return () => window.removeEventListener(FOCUS_WRITING, focus);
+  }, [setZenMode]);
   const { closeSaving, closeDiscarding, cancelClose, closePrompt } =
     wiring.close;
 

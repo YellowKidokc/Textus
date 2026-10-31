@@ -10,7 +10,7 @@
 /* global createEndpoint */
 (function () {
   "use strict";
-  var API_VERSION = "1.1";
+  var API_VERSION = "1.3";
   var app = null;
   var waiting = [];
   var module = { exports: {} };
@@ -557,6 +557,18 @@
       openExternal: function (url) {
         return call("layout.openExternal", { url: String(url) });
       },
+      openComparison: function (options) {
+        return call("layout.openComparison", plain(options));
+      },
+      linkComparison: function (id, on) {
+        return call("layout.linkComparison", { id: String(id), on: !!on });
+      },
+      showInspector: function (id) {
+        return call("layout.showInspector", { id: String(id) });
+      },
+      focusWriting: function (on) {
+        return call("layout.focusWriting", { on: !!on });
+      },
       activeTab: function () {
         return call("layout.activeTab");
       },
@@ -625,21 +637,27 @@
       getPath: function () {
         return call("editor.getPath");
       },
-      getText: function () {
-        return call("editor.getText");
+      getText: function (options) {
+        return call("editor.getText", plain(options || {}));
       },
-      getSelection: function () {
-        return call("editor.getSelection");
+      getSelection: function (options) {
+        return call("editor.getSelection", plain(options || {}));
       },
-      getBlocks: function () {
-        return call("editor.getBlocks");
+      getBlocks: function (options) {
+        return call("editor.getBlocks", plain(options || {}));
+      },
+      getParagraph: function (options) {
+        return call("editor.getParagraph", plain(options || {}));
       },
       getOutline: function () {
         return call("editor.getOutline");
       },
-      edit: function (changes) {
+      edit: function (changes, options) {
         return call("editor.edit", {
           changes: plain(Array.isArray(changes) ? changes : [changes]),
+          expectedText: options && options.expectedText,
+          expectedPath: options && options.expectedPath,
+          document: options && options.document,
         });
       },
       insertText: function (value) {
@@ -656,6 +674,9 @@
         return call("editor.propose", {
           change: plain(change),
           reason: options && options.reason,
+          expectedText: options && options.expectedText,
+          expectedPath: options && options.expectedPath,
+          document: options && options.document,
         });
       },
       reveal: function (location) {
@@ -856,6 +877,15 @@
       onDidChange: on("settings"),
     },
     ai: {
+      info: function () {
+        return call("ai.info");
+      },
+      request: function (options) {
+        return call("ai.request", plain(options));
+      },
+      cancel: function (id) {
+        return call("ai.cancel", { id: String(id) });
+      },
       // Runs one of the manifest's contributes.aiTools when Textus AI
       // calls it (ai.tools): `run(args)` answers with text for the model.
       registerTool: function (name, run) {
@@ -1082,7 +1112,9 @@
     $decorate: async function (params) {
       var out = [];
       for (var i = 0; i < decorationProviders.length; i++) {
-        var marks = await decorationProviders[i].decorate(params.blocks);
+        var marks = await decorationProviders[i].decorate(params.blocks, {
+          document: params.document,
+        });
         if (Array.isArray(marks)) out = out.concat(plain(marks));
       }
       return out;

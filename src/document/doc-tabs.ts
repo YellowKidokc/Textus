@@ -26,6 +26,8 @@ const HELP_GUIDES = new Map(
 export type HelpDoc = "markdown" | "agent";
 
 export interface DocTab {
+  workingRevision?: { name: string; comparison: string };
+  frozenOriginal?: { version: string; comparison: string };
   id: string;
   path: string | null;
   content: string;
@@ -76,6 +78,8 @@ export function helpDocContent(doc: HelpDoc, lang: string): Promise<string> {
 
 // A tab's display name everywhere one is shown.
 export function tabTitle(tab: DocTab, t: Strings): string {
+  if (tab.workingRevision)
+    return `${t.workbenchRevision} · ${tab.workingRevision.name}`;
   if (tab.path) return basename(tab.path);
   if (tab.view)
     return (

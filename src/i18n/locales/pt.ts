@@ -1519,6 +1519,11 @@ Habilidades ficam na pasta skills/ ao lado deste arquivo, um arquivo
   pluginStoppedAnswering: "parou de responder",
   pluginTooManyErrors: "falhou vezes demais",
   pluginQuickPickEmpty: "Nada corresponde.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "Ler o documento aberto e a seleção",
   pluginPermEditorWrite:
     "Alterar diretamente o documento aberto (cada alteração pode ser desfeita)",
@@ -1531,6 +1536,8 @@ Habilidades ficam na pasta skills/ ao lado deste arquivo, um arquivo
     "Assumir as teclas que você digita no editor e editar conforme digita",
   pluginPermProjectData:
     "Guardar os próprios dados na pasta aberta, em .textus/plugins",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Dar ao Textus AI ferramentas próprias para usar",
   pluginPermNotifications: "Mostrar notificações do sistema",
   pluginPermBackground:

@@ -11,6 +11,7 @@ function readOnlyPaths(): string[] {
 
 /** Whether the tab is read-only: as set on it, else as its file was left. */
 export function tabReadOnly(tab: DocTab): boolean {
+  if (tab.frozenOriginal) return true;
   if (tab.readOnly !== undefined) return tab.readOnly;
   return tab.path !== null && readOnlyPaths().includes(tab.path);
 }

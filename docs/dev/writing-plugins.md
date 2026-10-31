@@ -134,7 +134,7 @@ made when they are first shown.
 | `commands`      | Commands: `{ command, title }`.                                                                                                                                                                                                                                                                                        |
 | `keybindings`   | A shortcut for a command, as Settings writes them (`mod+alt+w`). Textus's own shortcuts win a clash; the user can change or clear it in Settings › Shortcuts.                                                                                                                                                          |
 | `menus`         | `editor/context` (the editor's right-click menu), `editor/slash` (offered when a word starts with `/`), `file/context` (a file's in the sidebar), `tab/context` (a tab's), `view/title` (buttons at the top of a sidebar view, with an `icon`), `app/plugins` (the Plugins menu), `app/tray` (background mode's icon). |
-| `sidebarTabs`   | `{ id, title, type: "list" \| "webview", icon }`: a sidebar tab. A list is drawn by Textus from `views.registerList`; a webview is the plugin's page. The icon is an SVG drawn in the text colour.                                                                                                                     |
+| `sidebarTabs`   | `{ id, title, type: "list" \| "webview", icon }`: a sidebar tab. `side: "right"` places a webview alongside the existing conversation dock (API 1.3); omitted means left. A list is drawn by Textus from `views.registerList`; a webview is the plugin's page. The icon is an SVG drawn in the text colour.            |
 | `views`         | `{ id, title, type }`: the same, opened in a tab of its own (`textus.layout.openView`).                                                                                                                                                                                                                                |
 | `customEditors` | `{ viewType, displayName, filenamePatterns: ["*.pdf"], priority }`: a file type opened in the plugin's tab instead of as a document.                                                                                                                                                                                   |
 | `codeBlocks`    | `{ language, title }`: fenced blocks in that language drawn by the plugin (`views.registerCodeBlock`). Textus's own languages (mermaid, math…) can't be taken.                                                                                                                                                         |
@@ -154,20 +154,22 @@ A menu item's `when` is a small expression over the moment it is shown:
 A plugin asks for these in `permissions`; the user grants them when
 turning it on, or leaves it off, and can take each back later.
 
-| Permission       | Lets the plugin                                                                        |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| `editor.read`    | read the document in front: its text, selection, blocks and outline                    |
-| `editor.write`   | change it at once, each change one undo step                                           |
-| `editor.propose` | suggest changes to it, shown as Textus AI's are, accepted or rejected by the user      |
-| `editor.input`   | take the editor's keys and move, select and edit with them (Vim, Emacs)                |
-| `files.read`     | list, find and read files in the open folder, and what Textus knows of them (metadata) |
-| `files.write`    | create, change, rename and trash files in the open folder                              |
-| `clipboard`      | read and write the clipboard                                                           |
-| `project.data`   | keep its own data in the open folder, in `.textus/plugins/<id>/`                       |
-| `ai.tools`       | give Textus AI tools to call                                                           |
-| `notifications`  | show system notifications, at once or on a schedule (API 1.1)                          |
-| `background`     | run its `background` code on a schedule, also with every window closed (API 1.1)       |
-| `network:<host>` | fetch from that host over HTTPS (`*.example.com`, `host:port`, `*` for the open web)   |
+| Permission       | Lets the plugin                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `editor.read`    | read the document in front: its text, selection, blocks and outline                                     |
+| `editor.write`   | change it at once, each change one undo step                                                            |
+| `editor.propose` | suggest changes to it, shown as Textus AI's are, accepted or rejected by the user                       |
+| `editor.targets` | explicitly target another open native document or read-only comparison snapshot (API 1.3)               |
+| `editor.input`   | take the editor's keys and move, select and edit with them (Vim, Emacs)                                 |
+| `files.read`     | list, find and read files in the open folder, and what Textus knows of them (metadata)                  |
+| `files.write`    | create, change, rename and trash files in the open folder                                               |
+| `clipboard`      | read and write the clipboard                                                                            |
+| `project.data`   | keep its own data in the open folder, in `.textus/plugins/<id>/`                                        |
+| `ai.request`     | request cancellable, version-tagged text from the configured provider; paid usage is possible (API 1.2) |
+| `ai.tools`       | give Textus AI tools to call                                                                            |
+| `notifications`  | show system notifications, at once or on a schedule (API 1.1)                                           |
+| `background`     | run its `background` code on a schedule, also with every window closed (API 1.1)                        |
+| `network:<host>` | fetch from that host over HTTPS (`*.example.com`, `host:port`, `*` for the open web)                    |
 
 Ask for what the plugin's purpose explains, and no more: each permission
 is shown to the user, and a listing in Textus asks why for the broad ones.
@@ -515,3 +517,24 @@ them light - a window of about 1200 px, cropped to what the plugin does.
 
 A new version is a new tag, and a pull request changing `version` in the
 same file. A published version never changes.
+
+### Explicit reviews and pinned native documents (API 1.3)
+
+`ai.info()` reads provider/model metadata from local settings without making a
+model request. Plugins can preview costs using their prompt estimate and
+user-supplied prices; this does not establish an exact bill or a hard spending
+cap. `ai.request` accepts `expectedProvider`/`expectedModel` to reject provider
+changes before a request starts. No credentials cross this interface.
+
+With `editor.targets`, read methods and atomic `edit`/`propose` accept an
+explicit `document` target. `layout.openComparison` creates a native read-only
+snapshot beside a separate saved revision and returns its opaque target.
+`getParagraph` reads the caret block, and decoration providers receive their
+native document target. Targeting a document does not change the atomic text
+and path checks or bypass the native editor's read-only filter.
+
+Declare a right-side webview with `sidebarTabs[].side: "right"` and show it
+with `layout.showInspector(id)`. The native conversation remains available in
+the same dock. `layout.focusWriting` uses native focus mode. Comparison linked
+scrolling is optional and proportional; paragraph correspondence is a separate
+content-mapping concern.

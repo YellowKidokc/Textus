@@ -302,7 +302,13 @@ export function MainPane({
                 docTitle={tabTitle(tab, t)}
                 initialValue={tab.content}
                 onChange={onChange}
-                isActive={tab.id === activeTabId}
+                isActive={
+                  !tab.frozenOriginal &&
+                  (tab.id === activeTabId ||
+                    (!!tab.workingRevision &&
+                      byId.get(activeTabId)?.frozenOriginal?.comparison ===
+                        tab.workingRevision.comparison))
+                }
                 tour={tour && tab.id === tour.tabId ? tour.ai : null}
                 tourMode={tour && tab.id === tour.tabId ? tour.mode : null}
                 readOnly={tabReadOnly(tab)}

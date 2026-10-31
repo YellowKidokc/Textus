@@ -46,6 +46,7 @@ import { explainError } from "../utils/error-explain";
 /** The editor's side of AI edits: pending previews, the two conversations
  *  that propose them, and streaming proposals into the document. */
 export function useEditorProposals({
+  tabId,
   run,
   pendingEditActionsRef,
   settingsRef,
@@ -55,6 +56,7 @@ export function useEditorProposals({
   onDecided,
   requestImageName,
 }: {
+  tabId: string;
   run: EditorRunner;
   pendingEditActionsRef: { current: PendingEditCallbacks };
   settingsRef: { readonly current: Settings };
@@ -395,7 +397,7 @@ export function useEditorProposals({
     [addPreviews],
   );
   // A plugin's edits are proposals too, shown as Textus AI's are.
-  usePluginDocumentAccess({ run, isActive, filePath, addPreviews });
+  usePluginDocumentAccess({ tabId, run, isActive, filePath, addPreviews });
 
   return {
     pendingEdits,

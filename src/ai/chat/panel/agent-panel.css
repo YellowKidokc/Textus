@@ -405,3 +405,39 @@
 .agent-panel-empty-text {
   animation: motion-fade-in var(--dur-fast) var(--ease-out);
 }
+
+.agent-panel-inspectors {
+  flex-direction: column;
+}
+.inspector-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  padding-right: var(--space-8);
+}
+.inspector-switch button {
+  min-height: var(--control-height);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-pill);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font-size: var(--text-control);
+}
+.inspector-switch button[aria-pressed="true"] {
+  background: var(--ui-selected);
+}
+.inspector-close {
+  position: absolute;
+  right: var(--space-1);
+  top: 32px;
+  color: var(--ui-text);
+}
+.agent-panel-inspectors > .plugin-webview-panel {
+  flex: 1;
+  min-height: 0;
+}
+.agent-panel .agent-panel-mount[hidden] {
+  display: none;
+}

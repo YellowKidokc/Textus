@@ -31,6 +31,8 @@ import { usePluginMenuSync } from "./contributions/usePluginMenu";
 import { openBeside } from "../app/split/split-layout";
 import { takePluginUris } from "./plugin-uri";
 import { migrateOfficialPlugins } from "./store/migrate-official";
+import { openComparisonWindow } from "./comparison-window";
+import { subscribeSplit } from "../app/split/split-layout";
 import { listenToThisWindow, unlistenAll } from "../platform/events";
 import { INSERT_BLOCK_EVENT, INSERT_BLOCK_KINDS } from "../utils/events";
 import { useSettings } from "../prefs/SettingsContext";
@@ -117,6 +119,8 @@ export function usePluginWindow({
       ...(tab.view ? { plugin: tab.view.plugin, view: tab.view.view } : {}),
     });
     setWindowAccess({
+      openComparison: (request) =>
+        openComparisonWindow(request, setTabs, setActiveTabId),
       rootPath: () => rootRef.current,
       openFile: (path, { place, asDocument, where }) =>
         void openRef.current(path, {
@@ -162,6 +166,7 @@ export function usePluginWindow({
     });
     return () => setWindowAccess(null);
   }, [rootRef, openRef, tabsRef, setTabs, setActiveTabId, activeIdRef, tRef]);
+  useEffect(() => subscribeSplit(() => emitPluginEvent("layout", null)), []);
 
   // File › Save and Close Tab for plugins with their own keys (Vim's :w, :q).
   // Close Tab with { save: true } closes only once it is saved.

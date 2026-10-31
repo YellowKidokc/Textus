@@ -1473,6 +1473,11 @@ ${AI_NAME}への執筆の指示です。すべての文書に適用されます�
   pluginStoppedAnswering: "応答しなくなりました",
   pluginTooManyErrors: "エラーが多すぎました",
   pluginQuickPickEmpty: "一致するものがありません。",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "表示中の文書と選択範囲を読む",
   pluginPermEditorWrite: "表示中の文書を直接変更する（変更は取り消せます）",
   pluginPermEditorPropose:
@@ -1484,6 +1489,8 @@ ${AI_NAME}への執筆の指示です。すべての文書に適用されます�
     "エディタで押すキーを引き受け、そのキーのとおりに編集する",
   pluginPermProjectData:
     "開いているフォルダー（.textus/plugins）に自分のデータを保存する",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Textus AI に独自のツールを提供する",
   pluginPermNotifications: "システム通知を表示する",
   pluginPermBackground:

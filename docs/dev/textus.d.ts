@@ -1,5 +1,5 @@
 /**
- * The Textus plugin API, 1.1: the `textus` object a plugin's code is given
+ * The Textus plugin API, 1.3: the `textus` object a plugin's code is given
  * (src/plugins/host/runtime/host.js), the context its `activate` receives, and
  * `acquireTextusApi()` in its webviews (runtime/webview.js). The one source
  * of truth: docs/dev/writing-plugins.md explains it, the reference pages are
@@ -159,7 +159,7 @@ declare global {
       /** Textus's UI language ("en", "zh", "zh-Hant", ...). */
       readonly language: string;
       readonly appVersion: string;
-      /** This API's version: "1.1". Check it before using what 1.1 added
+      /** This API's version: "1.3". Check it before using what 1.1 added
        *  (schedule, notify, app, change sources), or set engines.textus to
        *  ">=1.3.0-beta.8". */
       readonly apiVersion: string;
@@ -293,6 +293,22 @@ declare global {
     // ---------------------------------------------------------------
 
     interface Layout {
+      /** 1.3: A frozen read-only original and separate saved revision, through the native pane manager (editor.targets, files.read). */
+      openComparison(options: {
+        id: string;
+        originalText: string;
+        originalVersion: string;
+        revisionPath: string;
+        revisionTitle: string;
+        ratio?: number;
+      }): Promise<{ original: string; revision: string }>;
+      /** Opens one of this plugin's right-hand sidebar tabs. */
+      showInspector(id: string): Promise<void>;
+      /** Hides or restores supporting panels using native focus mode. */
+      focusWriting(on: boolean): Promise<void>;
+      /** Links scroll fractions for this plugin's current comparison; independent by default. */
+      linkComparison(id: string, on: boolean): Promise<boolean>;
+
       /** A file - a document, or a file a plugin's editor opens - at the
        *  location given. Needs files.read, except for the file a view of
        *  the plugin's shows. */
@@ -326,6 +342,7 @@ declare global {
       split(): Promise<{
         direction: "row" | "column" | null;
         panes: string[];
+        sizes?: number[];
       }>;
       onDidChangeActiveTab: Event<TabInfo | null>;
       onDidChangeLayout: Event<void>;
@@ -489,25 +506,49 @@ declare global {
       /** Its path; null for an unsaved one, and with no document. */
       getPath(): Promise<string | null>;
       /** Its Markdown (editor.read). */
-      getText(): Promise<string | null>;
-      getSelection(): Promise<{ text: string; markdown: string | null } | null>;
+      getText(options?: { document?: string }): Promise<string | null>;
+      getSelection(options?: {
+        document?: string;
+      }): Promise<{ text: string; markdown: string | null } | null>;
       /** Its blocks as Textus AI is shown them (editor.read). */
-      getBlocks(): Promise<Block[] | null>;
+      getBlocks(options?: { document?: string }): Promise<Block[] | null>;
+      /** The caret paragraph in an open document (1.3; editor.targets for a pinned target). */
+      getParagraph(options?: { document?: string }): Promise<Block | null>;
       getOutline(): Promise<
         { level: number; text: string; line: number }[] | null
       >;
       /** Changes it at once, as one undo step (editor.write). False when a
        *  change can't be placed (a block id from before an edit). */
-      edit(changes: Change | Change[]): Promise<boolean>;
+      edit(
+        changes: Change | Change[],
+        options?: {
+          /** 1.2: Both must match atomically in the host (editor.read). */
+          expectedText?: string;
+          expectedPath?: string;
+          /** 1.3: A file path or opaque original target returned by openComparison. Requires editor.targets. */
+          document?: string;
+        },
+      ): Promise<boolean>;
       /** At the caret, or in place of the selection (editor.write). */
       insertText(text: string): Promise<boolean>;
       replaceSelection(text: string): Promise<boolean>;
       /** Shown as a proposal the user accepts or rejects, as Textus AI's
        *  are (editor.propose). */
-      propose(change: Change, options?: { reason?: string }): Promise<boolean>;
+      propose(
+        change: Change,
+        options?: {
+          reason?: string;
+          /** 1.2: Both guards must match in the host when placing the proposal
+           * (also needs editor.read). False after an edit or document switch. */
+          expectedText?: string;
+          expectedPath?: string;
+          /** 1.3: A file path or opaque original target returned by openComparison. Requires editor.targets. */
+          document?: string;
+        },
+      ): Promise<boolean>;
       /** Scrolls to a place in it and puts the caret there. */
       reveal(
-        location: Omit<Location, "path"> & { path?: string },
+        location: Omit<Location, "path"> & { path?: string; document?: string },
       ): Promise<boolean>;
       /** Completions as you type, for one of `contributes.completions`
        *  (editor.read): asked when what is before the caret matches its
@@ -522,7 +563,10 @@ declare global {
       /** Marks over the text (editor.read), asked for the blocks in sight
        *  and again when they change. */
       registerDecorations(provider: {
-        decorate(blocks: Block[]): Decoration[] | Promise<Decoration[]>;
+        decorate(
+          blocks: Block[],
+          context?: { document: string | null },
+        ): Decoration[] | Promise<Decoration[]>;
       }): Disposable;
       /** Another document came to the front (or none). */
       onDidChangeActive: Event<{ path: string | null }>;
@@ -855,6 +899,30 @@ declare global {
     /** Tools for Textus AI (ai.tools): each one named in the manifest's
      *  contributes.aiTools, run here when the model calls it. */
     interface Ai {
+      /** Local configured provider metadata only; no model request. */
+      info(): Promise<{ provider: string; model: string | null }>;
+      /** 1.2: Text from the configured provider in Review mode (ai.request,
+       * editor.read). Uses the active saved document's project instructions,
+       * skills, style and library. Disables every backend tool and does not apply proposals. One
+       * request per plugin, six per minute, 80,000 prompt characters, 120s.
+       * Calls can incur provider charges; token usage is not supplied. */
+      request(options: {
+        id: string;
+        prompt: string;
+        version: string;
+        /** 1.3: Pin to another open saved document (editor.targets). */
+        document?: string;
+        expectedProvider?: string;
+        expectedModel?: string | null;
+      }): Promise<{
+        text: string;
+        provider: string;
+        model: string | null;
+        version: string;
+        docPath: string;
+      }>;
+      /** Cancels only this plugin's matching request. */
+      cancel(id: string): Promise<void>;
       registerTool(
         name: string,
         run: (

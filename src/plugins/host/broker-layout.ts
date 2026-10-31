@@ -5,6 +5,8 @@ import { getWindowAccess, type PluginLocation } from "../app-bridge";
 import { localize } from "../store/manifest";
 import { webviewsOf } from "../views/webviews";
 import { webPageUrl } from "../views/web-page-url";
+import { showInspector, FOCUS_WRITING } from "../../app/inspector-tabs";
+import { setComparisonScrolling } from "../comparison-window";
 import {
   optionalStr,
   str,
@@ -57,6 +59,46 @@ export function layoutHandlers(p: PluginScope) {
     return w;
   };
   return {
+    "layout.linkComparison": ({ id, on }: Params) => {
+      p.need("editor.targets");
+      return setComparisonScrolling(`${p.id}:${str(id, "id")}`, on === true);
+    },
+    "layout.openComparison": (args: Params) => {
+      p.need("editor.targets");
+      p.need("files.read");
+      const id = str(args.id, "id");
+      if (!/^[a-zA-Z0-9-]{1,80}$/.test(id))
+        throw new Error("Invalid comparison identity.");
+      const originalText = str(args.originalText, "originalText");
+      if (originalText.length > 2_000_000)
+        throw new Error("Snapshot too large.");
+      return access().openComparison({
+        id: `${p.id}:${id}`,
+        originalText,
+        originalTitle: p.t().workbenchOriginal,
+        originalVersion: str(args.originalVersion, "originalVersion"),
+        revisionPath: str(args.revisionPath, "revisionPath"),
+        revisionTitle: str(args.revisionTitle, "revisionTitle"),
+        ratio:
+          typeof args.ratio === "number" &&
+          args.ratio >= 0.2 &&
+          args.ratio <= 0.8
+            ? args.ratio
+            : 0.5,
+      });
+    },
+    "layout.showInspector": ({ id }: Params) => {
+      const own = p
+        .manifest()
+        .contributes.sidebarTabs.find((t) => t.id === id && t.side === "right");
+      if (!own) throw new Error("No declared inspector.");
+      showInspector(own.id);
+    },
+    "layout.focusWriting": ({ on }: Params) =>
+      window.dispatchEvent(
+        new CustomEvent(FOCUS_WRITING, { detail: on === true }),
+      ),
+
     "layout.open": ({ location, where, asDocument }: Params) => {
       const place = locationOf(location);
       if (!webviewsOf(p.id).some((view) => view.resource === place.path))
@@ -122,6 +164,7 @@ export function layoutHandlers(p: PluginScope) {
       return layout
         ? {
             direction: layout.root.direction,
+            sizes: layout.root.sizes,
             panes: panesOf(layout.root).map((p) => p.front),
           }
         : { direction: null, panes: [] };

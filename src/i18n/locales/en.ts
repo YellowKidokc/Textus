@@ -1503,6 +1503,11 @@ type /name in a conversation to use one.
   pluginStoppedAnswering: "it stopped answering",
   pluginTooManyErrors: "it failed too often",
   pluginQuickPickEmpty: "Nothing matches.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "Read the document in front and its selection",
   pluginPermEditorWrite:
     "Change the document in front directly (each change can be undone)",
@@ -1515,6 +1520,8 @@ type /name in a conversation to use one.
     "Take over the keys you type in the editor, and edit as you type",
   pluginPermProjectData:
     "Keep its own data in the open folder, in .textus/plugins",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Give Textus AI tools of its own to use",
   pluginPermNotifications: "Show system notifications",
   pluginPermBackground: "Run code on a schedule, even with every window closed",

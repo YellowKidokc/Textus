@@ -24,6 +24,7 @@ import {
 import { evaluateWhen, type WhenContext } from "./when";
 import { addCodeBlockLanguage } from "./code-blocks";
 import { addSlashItems } from "./slash-commands";
+import { registerInspector } from "../../app/inspector-tabs";
 
 /**
  * What an on plugin adds to the window, registered from its manifest alone;
@@ -166,28 +167,39 @@ export function applyContributions(
   }
   for (const tab of sidebarTabs)
     undo.push(
-      registerSidebarTab({
-        id: tab.id,
-        label: () => text(tab.title),
-        Icon: () =>
-          createElement(PluginTabIcon, {
-            plugin: id,
-            origin: record.origin,
-            icon: tab.icon,
-          }),
-        Panel: () =>
-          tab.type === "list"
-            ? createElement(PluginListPane, {
-                plugin: id,
-                view: tab.id,
-                className: "plugin-list-sidebar",
-              })
-            : createElement(PluginWebviewPanel, {
+      tab.side === "right"
+        ? registerInspector({
+            id: tab.id,
+            label: () => text(tab.title),
+            Panel: () =>
+              createElement(PluginWebviewPanel, {
                 plugin: id,
                 view: tab.id,
                 kind: "sidebar",
               }),
-      }),
+          })
+        : registerSidebarTab({
+            id: tab.id,
+            label: () => text(tab.title),
+            Icon: () =>
+              createElement(PluginTabIcon, {
+                plugin: id,
+                origin: record.origin,
+                icon: tab.icon,
+              }),
+            Panel: () =>
+              tab.type === "list"
+                ? createElement(PluginListPane, {
+                    plugin: id,
+                    view: tab.id,
+                    className: "plugin-list-sidebar",
+                  })
+                : createElement(PluginWebviewPanel, {
+                    plugin: id,
+                    view: tab.id,
+                    kind: "sidebar",
+                  }),
+          }),
     );
   for (const block of codeBlocks)
     undo.push(addCodeBlockLanguage(block.language, id));

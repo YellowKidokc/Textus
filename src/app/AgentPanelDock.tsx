@@ -9,6 +9,14 @@ import {
 import { ResizeHandle } from "../ui/ResizeHandle";
 import type { Strings } from "../i18n/strings";
 import { TextusAiOffNote } from "../ai/TextusAiSwitch";
+import { useSyncExternalStore } from "react";
+import {
+  inspectorTabs,
+  inspectorVersion,
+  subscribeInspectors,
+  selectedInspector,
+  selectInspector,
+} from "./inspector-tabs";
 
 /** The docked Agent panel's frame (a bottom sheet on a phone); the active
  *  tab's editor renders its conversation into the mount point here. */
@@ -43,13 +51,17 @@ export function AgentPanelDock({
   aiOn: boolean;
   t: Strings;
 }) {
+  useSyncExternalStore(subscribeInspectors, inspectorVersion);
+  const tabs = inspectorTabs();
+  const selected = tabs.find((tab) => tab.id === selectedInspector());
+  const Panel = selected?.Panel;
   return (
     <aside
       ref={presence.ref}
       aria-label={t.agentPanelTitle}
       data-state={presence.state}
       inert={closing || undefined}
-      className={`agent-panel${sheetFull ? " agent-panel-sheet-full" : ""}`}
+      className={`agent-panel${tabs.length ? " agent-panel-inspectors" : ""}${sheetFull ? " agent-panel-sheet-full" : ""}`}
       style={{ width }}
     >
       {/* Phone widths: the bottom sheet's handle. */}
@@ -71,11 +83,42 @@ export function AgentPanelDock({
         onReset={() => onResize(AGENT_PANEL_DEFAULT_WIDTH, true)}
         label={t.agentPanelResize}
       />
-      <div className="agent-panel-mount" ref={mountRef} />
+      {!!tabs.length && (
+        <div className="inspector-switch">
+          <button
+            onClick={() => selectInspector("chat")}
+            aria-pressed={!selected}
+          >
+            {t.workbenchChat}
+          </button>
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => selectInspector(tab.id)}
+              aria-pressed={selected?.id === tab.id}
+            >
+              {tab.label()}
+            </button>
+          ))}
+        </div>
+      )}
+      {!!tabs.length && (
+        <button
+          className="inspector-close"
+          onClick={onClose}
+          aria-label={t.workbenchHideNotes}
+        >
+          ×
+        </button>
+      )}
+      <div className="agent-panel-mount" ref={mountRef} hidden={!!selected} />
+      {Panel && <Panel />}
       {/* Source mode, split view and AI off have no conversation, so say so
         instead of an empty column. */}
-      {!aiOn && <TextusAiOffNote className="agent-panel-placeholder" />}
-      {aiOn && sourceMode && (
+      {!selected && !aiOn && (
+        <TextusAiOffNote className="agent-panel-placeholder" />
+      )}
+      {!selected && aiOn && sourceMode && (
         <div className="agent-panel-placeholder">
           <p>{t.agentPanelSourceMode}</p>
           <button

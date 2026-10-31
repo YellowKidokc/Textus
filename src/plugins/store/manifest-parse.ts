@@ -249,6 +249,7 @@ export function parseContributes(raw: unknown, id: string): Contributes {
         id: ownId(o.id, id, `contributes.sidebarTabs[${i}].id`),
         title: text(o.title, `contributes.sidebarTabs[${i}].title`),
         type: viewType(o.type, `contributes.sidebarTabs[${i}].type`),
+        ...(o.side === "right" ? { side: "right" as const } : {}),
         icon:
           text(o.icon, `contributes.sidebarTabs[${i}].icon`, true) || undefined,
       };

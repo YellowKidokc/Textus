@@ -11,7 +11,11 @@ import {
   type EditorOp,
 } from "../contributions/editor-input";
 import { outlineOf } from "../contributions/status-items";
-import { getActiveDocument, type ActiveDocumentAccess } from "../app-bridge";
+import {
+  getActiveDocument,
+  getDocumentAccess,
+  type ActiveDocumentAccess,
+} from "../app-bridge";
 import {
   addHoverProvider,
   removeHoverProvider,
@@ -85,31 +89,75 @@ function editOf(
 export function editorHandlers(p: PluginScope) {
   const doc = (
     permission: "editor.read" | "editor.write" | "editor.propose",
+    document?: unknown,
   ) => {
     p.need(permission);
+    if (typeof document === "string") {
+      p.need("editor.targets");
+      return getDocumentAccess(document);
+    }
     return getActiveDocument();
   };
-  const open = (permission: "editor.write" | "editor.propose") => {
-    const d = doc(permission);
+  const open = (
+    permission: "editor.write" | "editor.propose",
+    document?: unknown,
+  ) => {
+    const d = doc(permission, document);
     if (!d) throw new Error("No document is open.");
     return d;
   };
   return {
     "editor.getPath": () => doc("editor.read")?.path ?? null,
-    "editor.getText": () => doc("editor.read")?.text() ?? null,
-    "editor.getSelection": () => doc("editor.read")?.selection() ?? null,
-    "editor.getBlocks": () => doc("editor.read")?.blocks() ?? null,
+    "editor.getText": ({ document }: Params) =>
+      doc("editor.read", document)?.text() ?? null,
+    "editor.getSelection": ({ document }: Params) =>
+      doc("editor.read", document)?.selection() ?? null,
+    "editor.getBlocks": ({ document }: Params) =>
+      doc("editor.read", document)?.blocks() ?? null,
+    "editor.getParagraph": ({ document }: Params) =>
+      doc("editor.read", document)?.paragraph?.() ?? null,
     "editor.getOutline": () => {
       const text = doc("editor.read")?.text();
       return text === undefined ? null : outlineOf(text);
     },
-    "editor.edit": ({ changes }: Params) => {
-      const d = open("editor.write");
+    "editor.edit": ({
+      changes,
+      expectedText,
+      expectedPath,
+      document,
+    }: Params) => {
+      const d = open("editor.write", document);
+      if (expectedText !== undefined || expectedPath !== undefined) {
+        p.need("editor.read");
+        if (
+          typeof expectedText !== "string" ||
+          typeof expectedPath !== "string" ||
+          d.text() !== expectedText ||
+          d.path !== expectedPath
+        )
+          return false;
+      }
       const list = Array.isArray(changes) ? changes : [changes];
       return d.edit(list.map((change) => editOf(d, change)));
     },
-    "editor.propose": ({ change, reason }: Params) => {
-      const d = open("editor.propose");
+    "editor.propose": ({
+      change,
+      reason,
+      document,
+      expectedText,
+      expectedPath,
+    }: Params) => {
+      const d = open("editor.propose", document);
+      if (expectedText !== undefined || expectedPath !== undefined) {
+        p.need("editor.read");
+        if (
+          typeof expectedText !== "string" ||
+          typeof expectedPath !== "string" ||
+          d.text() !== expectedText ||
+          d.path !== expectedPath
+        )
+          return false;
+      }
       const said = optionalStr(reason);
       return d.propose(
         `plugin-${p.id}-${++proposalCounter}`,
@@ -117,7 +165,11 @@ export function editorHandlers(p: PluginScope) {
       );
     },
     "editor.reveal": ({ location }: Params) => {
-      const d = getActiveDocument();
+      const target =
+        location && typeof location === "object"
+          ? (location as Record<string, unknown>).document
+          : undefined;
+      const d = doc("editor.read", target);
       if (!d || !location || typeof location !== "object") return false;
       const l = location as Record<string, unknown>;
       return d.reveal({
@@ -135,8 +187,8 @@ export function editorHandlers(p: PluginScope) {
     },
     "editor.registerDecorations": () => {
       p.need("editor.read");
-      addDecorationProvider(p.id, (blocks) =>
-        p.request<PluginDecoration[]>("$decorate", { blocks }),
+      addDecorationProvider(p.id, (blocks, document) =>
+        p.request<PluginDecoration[]>("$decorate", { blocks, document }),
       );
     },
     "editor.unregisterDecorations": () => removeDecorationProvider(p.id),

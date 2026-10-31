@@ -17,6 +17,7 @@ export { ManifestError } from "./manifest-parse";
 /** A permission, as the manifest names it. `network:<host>` names one
  *  host (`*.domain` for its subdomains, `host:port`, or `*` for any). */
 export type Permission =
+  | "editor.targets"
   | "editor.read"
   | "editor.write"
   | "editor.propose"
@@ -26,11 +27,13 @@ export type Permission =
   | "editor.input"
   | "project.data"
   | "ai.tools"
+  | "ai.request"
   | "notifications"
   | "background"
   | `network:${string}`;
 
 const PLAIN_PERMISSIONS = [
+  "editor.targets",
   "editor.read",
   "editor.write",
   "editor.propose",
@@ -40,6 +43,7 @@ const PLAIN_PERMISSIONS = [
   "editor.input",
   "project.data",
   "ai.tools",
+  "ai.request",
   "notifications",
   "background",
 ] as const;
@@ -104,6 +108,7 @@ export interface MenuContribution {
 export type ViewType = "list" | "webview";
 
 export interface SidebarTabContribution {
+  side?: "left" | "right";
   id: string;
   title: string;
   type: ViewType;

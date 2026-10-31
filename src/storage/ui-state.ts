@@ -8,6 +8,7 @@ import { trackWrite } from "./pending-writes";
  * into open windows; values come back untrusted, so callers validate.
  */
 export interface UiState {
+  inspectorTab: string;
   /** The onboarding tour's step. */
   tutorialProgress: unknown;
   agentPanelOpen: boolean;
@@ -84,6 +85,11 @@ const LOCAL: {
     encode: (value: UiState[K]) => string;
   };
 } = {
+  inspectorTab: {
+    key: "textus-inspector-tab",
+    decode: (raw) => raw,
+    encode: (value) => value,
+  },
   tutorialProgress: {
     key: "textus-tutorial-progress",
     decode: (raw) => JSON.parse(raw),

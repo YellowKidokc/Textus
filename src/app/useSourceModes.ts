@@ -76,7 +76,7 @@ export function useSourceModes(tabState: TabState) {
   const toggleReadOnly = useCallback(
     (id: string = activeTabId) => {
       const tab = liveTabs().find((tb) => tb.id === id);
-      if (!tab || tab.view) return;
+      if (!tab || tab.view || tab.frozenOriginal) return;
       const next = !tabReadOnly(tab);
       if (tab.path) keepReadOnly(tab.path, next);
       updateTab(tab.id, { readOnly: next });

@@ -6,6 +6,7 @@ const LABELS: Record<
   Exclude<Permission, `network:${string}`>,
   keyof Strings
 > = {
+  "editor.targets": "pluginPermEditorTargets",
   "editor.read": "pluginPermEditorRead",
   "editor.write": "pluginPermEditorWrite",
   "editor.propose": "pluginPermEditorPropose",
@@ -15,6 +16,7 @@ const LABELS: Record<
   "editor.input": "pluginPermEditorInput",
   "project.data": "pluginPermProjectData",
   "ai.tools": "pluginPermAiTools",
+  "ai.request": "pluginPermAiRequest",
   notifications: "pluginPermNotifications",
   background: "pluginPermBackground",
 };

@@ -15,6 +15,7 @@ import { getUiState, setUiState } from "../storage/ui-state";
 import { setDockedPanelWidth } from "../utils/hooks/useDockedPanelWidth";
 import { useSidebarWidth } from "./sidebar-width";
 import { storeSidebarTab, storedSidebarTab } from "./sidebar-tab";
+import { INSPECTOR_OPEN, selectedInspector } from "./inspector-tabs";
 
 /** A sidebar tab's id. */
 export type PanelMode = string;
@@ -58,8 +59,13 @@ export function useSidePanels(aiOn: boolean) {
   const pendingAgentOpen = useRef<(() => void) | null>(null);
   const setAgentOpen = agentPanel.setOpen;
   useEffect(() => {
-    if (!aiOn) setAgentOpen(false);
+    if (!aiOn && selectedInspector() === "chat") setAgentOpen(false);
   }, [aiOn, setAgentOpen]);
+  useEffect(() => {
+    const open = () => setAgentOpen(true);
+    window.addEventListener(INSPECTOR_OPEN, open);
+    return () => window.removeEventListener(INSPECTOR_OPEN, open);
+  }, [setAgentOpen]);
   const toggleAgentPanel = useCallback(() => {
     if (!aiOn) return;
     if (pendingAgentOpen.current) {

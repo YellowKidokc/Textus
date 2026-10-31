@@ -21,6 +21,7 @@ import { metadataHandlers } from "./broker-metadata";
 import { stopPluginUi, uiHandlers } from "./broker-ui";
 import { viewHandlers } from "./broker-views";
 import { scheduleHandlers } from "./broker-schedule";
+import { aiHandlers, stopPluginAi } from "./broker-ai";
 import { currentAppState } from "../background/app-state";
 import { forgetListViews } from "../contributions/list-views";
 import { forgetWillExport } from "../contributions/will-export";
@@ -202,6 +203,7 @@ export class PluginHost {
     this.subscriptions.clear();
     stopPluginUi(this.id);
     stopPluginEditor(this.id);
+    stopPluginAi(this.id);
     forgetListViews(this.id);
     forgetWillSave(this.id);
     forgetWillExport(this.id);
@@ -367,6 +369,7 @@ export class PluginHost {
       ...fileHandlers(scope),
       ...metadataHandlers(scope),
       ...scheduleHandlers(scope, () => getWindowAccess()?.rootPath() ?? null),
+      ...aiHandlers(scope),
     };
   }
 }

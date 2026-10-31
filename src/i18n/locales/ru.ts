@@ -1530,6 +1530,11 @@ export default {
   pluginStoppedAnswering: "он перестал отвечать",
   pluginTooManyErrors: "он слишком часто давал сбой",
   pluginQuickPickEmpty: "Ничего не найдено.",
+  pluginPermEditorTargets: "Access other open documents for split editing",
+  workbenchHideNotes: "Hide supporting panel",
+  workbenchChat: "AI conversation",
+  workbenchOriginal: "Original snapshot · Read-only",
+  workbenchRevision: "Working revision",
   pluginPermEditorRead: "Читать открытый документ и выделенный текст",
   pluginPermEditorWrite:
     "Менять открытый документ напрямую (каждое изменение можно отменить)",
@@ -1542,6 +1547,8 @@ export default {
     "Перехватывать клавиши в редакторе и править текст по ним",
   pluginPermProjectData:
     "Хранить свои данные в открытой папке, в .textus/plugins",
+  pluginPermAiRequest:
+    "Request AI text using your configured provider (may incur charges)",
   pluginPermAiTools: "Давать Textus AI свои инструменты",
   pluginPermNotifications: "Показывать системные уведомления",
   pluginPermBackground:

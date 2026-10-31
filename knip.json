@@ -3,6 +3,7 @@
   "entry": [
     "src/playground/main.tsx",
     "src/plugin-api.ts",
+    "src/plugins/workbench/host.ts",
     "src/**/*.test.{ts,tsx}",
     "e2e/**/*.ts",
     "scripts/**/*.mjs",

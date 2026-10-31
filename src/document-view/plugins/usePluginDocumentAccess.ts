@@ -5,9 +5,11 @@ import {
   cachedDocument,
   caretContext,
   readSelection,
+  serializeBlocks,
 } from "../../ai/doc-markdown";
 import {
   setActiveDocument,
+  registerDocumentAccess,
   setOpenDocument,
   type ActiveDocumentAccess,
   type OpenDocumentAccess,
@@ -25,11 +27,13 @@ import type { useEditorProposals } from "../useEditorProposals";
  * edits and proposals; in any tab, its text to read and change in place.
  */
 export function usePluginDocumentAccess({
+  tabId,
   run,
   isActive,
   filePath,
   addPreviews,
 }: {
+  tabId: string;
   run: EditorRunner;
   isActive: boolean;
   filePath: string | null;
@@ -53,9 +57,18 @@ export function usePluginDocumentAccess({
   }, [run, filePath]);
 
   useEffect(() => {
-    if (!isActive) return;
     const access: ActiveDocumentAccess = {
       path: filePath,
+      paragraph: () =>
+        run((ctx) => {
+          const { state } = ctx.get(editorViewCtx);
+          return (
+            serializeBlocks(ctx, state.doc).find(
+              (b) =>
+                state.selection.from >= b.from && state.selection.from <= b.to,
+            ) ?? null
+          );
+        }) ?? null,
       text: () =>
         run(
           (ctx) =>
@@ -91,7 +104,11 @@ export function usePluginDocumentAccess({
       edit: (edits) => run((ctx) => applyPluginEdits(ctx, edits)) ?? false,
       reveal: (place) => run((ctx) => revealPlace(ctx, place)) ?? false,
     };
-    setActiveDocument(access);
-    return () => setActiveDocument(null, access);
-  }, [run, isActive, filePath, addPreviews]);
+    const remove = registerDocumentAccess(filePath ?? `tab:${tabId}`, access);
+    if (isActive) setActiveDocument(access);
+    return () => {
+      remove();
+      if (isActive) setActiveDocument(null, access);
+    };
+  }, [run, isActive, filePath, addPreviews, tabId]);
 }

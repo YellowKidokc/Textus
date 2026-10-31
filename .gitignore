@@ -53,3 +53,5 @@ playwright-report/
 # The official plugins checked out beside the app, for the dev server
 # and the plugin flows (vite.dev-plugins.ts); a repository of its own.
 textus-plugins/
+
+/dist-workbench/
