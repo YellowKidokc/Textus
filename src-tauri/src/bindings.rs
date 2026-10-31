@@ -238,7 +238,9 @@ fn groups() -> Vec<(&'static str, Builder<tauri::Wry>)> {
                 // Commands reading their inputs as one struct can't be generated; their
                 // input types are.
                 .typ::<crate::ai::client::CompletionRequest>()
-                .typ::<crate::ai::client::GrammarRequest>(),
+                .typ::<crate::ai::client::GrammarRequest>()
+                .typ::<crate::ai::client::PluginRequest>()
+                .typ::<crate::ai::client::PluginReply>(),
         ),
         (
             "ai-agent.ts",

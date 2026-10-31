@@ -103,7 +103,22 @@ pub async fn call_completion_with_usage(
     user_text: String,
     model: Option<&str>,
 ) -> Result<(String, StepUsage), String> {
-    let body = completion_request(auth, instructions, user_text, model);
+    call_completion_capped(auth, instructions, user_text, model, None).await
+}
+
+/// [`call_completion_with_usage`] with the reply held to `max_tokens` by the
+/// API itself; None keeps the single-call default.
+pub async fn call_completion_capped(
+    auth: &AnthropicAuth,
+    instructions: String,
+    user_text: String,
+    model: Option<&str>,
+    max_tokens: Option<u32>,
+) -> Result<(String, StepUsage), String> {
+    let mut body = completion_request(auth, instructions, user_text, model);
+    if let Some(max_tokens) = max_tokens {
+        body.max_tokens = max_tokens;
+    }
     let client = crate::http::client();
     let res = apply_auth(client.post(MESSAGES_URL), auth)
         .json(&body)

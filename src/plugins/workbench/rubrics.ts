@@ -35,6 +35,15 @@ export interface RubricAssessment {
   model: string | null;
   at: string;
   results: CriterionResult[];
+  /** Whether the provider held the reply to the cap, and its own token
+   *  count; absent on assessments saved before they were recorded. */
+  outputLimit?: "enforced" | "requested" | "none";
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadInputTokens: number;
+    cacheCreationInputTokens: number;
+  } | null;
 }
 
 const plain = (v: unknown): v is Record<string, unknown> =>

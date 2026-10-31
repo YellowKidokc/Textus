@@ -58,7 +58,11 @@ remapped. No archive or executable format is accepted.
 
 Manual requests analyze the managed blocks up to an 80,000-character prompt
 limit, with one request at a time, six per minute and a two-minute timeout.
-Token usage and exact cost are unavailable. No timer or background analysis
+Each request sends Textus's fixed plugin instructions and the workbench's
+prompt only: no project instructions, library, style profile, memories or
+other document text are added. Exact cost is unavailable; the provider's own
+token count is saved with a rubric result where the provider reports it
+(Claude through the Anthropic API), otherwise it is unavailable. No timer or background analysis
 is enabled. Cancellation, provider errors and stale results do not affect
 local saving. Old analyses remain inspectable and cannot update current
 coverage. Confirmation belongs to the exact passage and becomes stale after
@@ -85,8 +89,11 @@ and custom rubrics. Load or export JSON locally. Select the paper, block,
 paragraph, native selection, or an explicitly enabled original snapshot.
 Enter your provider's USD prices per million input/output tokens, then choose
 **Estimate cost** and **Run assessment**. Unknown prices are shown as unknown;
-the byte-based token estimate is approximate and is not a billing cap. Only
-Run makes the review request. Changing provider/model after the preview blocks
+the byte-based token estimate is approximate and is not a billing cap. The
+preview shows the whole request Run will send, and Run sends exactly that. The
+output allowance is enforced by the provider only where the preview says so;
+elsewhere it is asked for in the prompt and a reply can run longer. Only Run
+makes the review request. Changing provider/model after the preview blocks
 Run until it is estimated again. Results retain the entire examined version
 and rubric. Identical requests reuse the saved result across reopening.
 

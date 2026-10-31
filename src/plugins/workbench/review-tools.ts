@@ -39,7 +39,8 @@ export function createReviewTools(
     version: string;
     scope: string;
     rubric: Rubric;
-    prompt: string;
+    /** What Run sends, exactly: the estimate is of this. */
+    manifest: Textus.AiRequestManifest;
     inputTokens: number;
     outputTokens: number;
     usd: number | null;
@@ -118,6 +119,10 @@ export function createReviewTools(
             scope: preview.scope,
             provider: preview.provider,
             model: preview.model,
+            outputLimit: preview.manifest.outputLimit,
+            sources: preview.manifest.sources,
+            instructions: preview.manifest.instructions,
+            prompt: preview.manifest.prompt,
           }
         : null,
       error,
@@ -232,16 +237,29 @@ export function createReviewTools(
         )
       )
         throw new Error(tr("invalidReply"));
-      info = await textus.ai.info();
-      const prompt =
-        rubricPrompt(current, source.text) +
-        `\nKeep the response concise, approximately under ${outputTokens} tokens.`;
+      const s = host.state();
+      if (!s.path) throw new Error(tr("saveFirst"));
+      // The text the provider is asked to keep under; enforced by it only
+      // where the manifest says "enforced".
+      const manifest = await textus.ai.prepare({
+        document: s.path,
+        maxOutputTokens: outputTokens,
+        prompt:
+          rubricPrompt(current, source.text) +
+          `\nKeep the response concise, approximately under ${outputTokens} tokens.`,
+      });
+      info = { provider: manifest.provider, model: manifest.model };
       preview = {
         ...source,
         scope: String(m.scope),
         rubric: structuredClone(current),
-        prompt,
-        ...estimateReview(prompt, outputTokens, inputRate, outputRate),
+        manifest,
+        ...estimateReview(
+          manifest.instructions + manifest.prompt,
+          outputTokens,
+          inputRate,
+          outputRate,
+        ),
         ...info,
       };
       error = "";
@@ -283,11 +301,13 @@ export function createReviewTools(
       message = "";
       host.publish();
       try {
+        // The request the preview showed: same document, prompt and cap.
         const reply = await textus.ai.request({
           id,
-          document: path,
+          document: pinned.manifest.document,
           version: pinned.version,
-          prompt: pinned.prompt,
+          prompt: pinned.manifest.prompt,
+          maxOutputTokens: pinned.manifest.maxOutputTokens ?? undefined,
           expectedProvider: pinned.provider,
           expectedModel: pinned.model,
         });
@@ -323,6 +343,8 @@ export function createReviewTools(
                   model: reply.model,
                   at: new Date().toISOString(),
                   results,
+                  outputLimit: reply.outputLimit,
+                  usage: reply.usage,
                 },
               ],
             },

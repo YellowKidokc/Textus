@@ -8,6 +8,8 @@ import type { AgentMode } from "../prefs/SettingsContext";
 import type {
   CompletionRequest_Deserialize as CompletionRequest,
   GrammarRequest_Deserialize as GrammarRequest,
+  PluginRequest_Deserialize as PluginRequest,
+  PluginReply_Serialize as PluginReply,
 } from "./bindings/ai";
 import type { AgentTurn_Deserialize as AgentTurnInput } from "./bindings/ai-agent";
 import type {
@@ -195,6 +197,10 @@ export const ai = {
       workspaceRoot: project.workspaceRoot,
       uiLanguage,
     } satisfies GrammarRequest),
+  /** A plugin's request: these instructions and this prompt alone, with no
+   *  project context, document or tools added. Cancelled by ai_cancel. */
+  pluginRequest: (request: PluginRequest) =>
+    aiCall<PluginReply>("ai_plugin_request", request),
   agentMessage: ({
     onEvent,
     ...args
@@ -218,8 +224,6 @@ export const ai = {
     /** What web_search uses when the model can't search by itself. */
     searchService?: string;
     searxngUrl?: string;
-    /** Disable all backend tools; mirrors text_only in src-tauri/src/ai/agent/mod.rs. */
-    textOnly?: boolean;
     mode: AgentMode;
     model: string | null;
     requestId: string;

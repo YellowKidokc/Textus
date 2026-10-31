@@ -80,9 +80,6 @@ pub async fn ai_agent_message(
     ui_language: Option<String>,
     // The image model; None for none, and from an older frontend.
     image_model: Option<crate::ai::images::ImageModel>,
-    // Text-only plugin requests disable every tool, including MCP/plugin tools.
-    // Keep in step with textOnly in src/platform/ipc.ts.
-    text_only: Option<bool>,
     on_event: Channel<StreamEvent>,
 ) -> Result<Vec<AgentTurn>, String> {
     crate::ai::ensure_on(&app)?;
@@ -109,7 +106,6 @@ pub async fn ai_agent_message(
             focus_heading,
             ui_language,
             image_model,
-            text_only.unwrap_or(false),
             &on_event,
         ),
     )
@@ -135,7 +131,6 @@ async fn ai_agent_message_inner(
     focus_heading: Option<String>,
     ui_language: String,
     image_model: Option<crate::ai::images::ImageModel>,
-    text_only: bool,
     on_event: &dyn EventSink,
 ) -> Result<Vec<AgentTurn>, String> {
     let mut workspace = workspace::load(&app, doc_path.as_deref(), workspace_root.as_deref());
@@ -250,60 +245,55 @@ async fn ai_agent_message_inner(
                 channel: on_event,
                 helpers: &helpers,
             };
-            let tools = if text_only {
-                ToolRegistry::new(mode)
-            } else {
-                let mut tools = ToolRegistry::builtin(
-                    workspace.has_usable_skills(),
-                    workspace.root.is_some(),
-                    mode,
-                    entry.supports_vision,
-                );
-                if helper_tools.edits() && offers_chapters(&document) {
-                    let run = &chapter_run;
-                    tools.add(tools::Tool {
-                        spec: chapters_spec(),
-                        access: tools::Access::Proposes,
-                        modes: tools::EDITING_MODES,
-                        run: tools::Run::Async(Box::new(move |call| Box::pin(run.run(call)))),
-                    });
-                }
-                // A document shown whole needs no tools to read it: offered, they were
-                // read again and again instead of edited.
-                if context::shown_whole(&document, true) {
-                    tools.remove(tools::SEARCH_TOOL_NAME);
-                    tools.remove(tools::READ_DOCUMENT_TOOL_NAME);
-                }
-                if let Some(image_run) = &image_run {
-                    tools.add(image_run.tool(
-                        &document,
-                        crate::ai::images::ProposedText {
-                            this_request: &tool_ctx.proposed,
-                            undecided: &undecided,
-                        },
-                        on_event,
-                    ));
-                }
-                for tool in web.tools(&focus) {
-                    tools.add(tool);
-                }
-                // The user's earlier conversations, when they refer to one.
-                tools.add(search_conversations_tool(&stores.chat));
-                // The tools of the MCP servers the user turned on.
-                #[cfg(desktop)]
-                for tool in crate::mcp::tools_for_request(&app).await {
-                    tools.add(tool);
-                }
-                // And of the plugins the user gave ai.tools.
-                for tool in crate::plugins::ai_tools::tools_for_request(&app) {
-                    tools.add(tool);
-                }
-                // Create mode reads the plugins installed, to change one.
-                if let Some(tool) = crate::plugins::read_tool::read_plugin_tool(&app) {
-                    tools.add(tool);
-                }
-                tools
-            };
+            let mut tools = ToolRegistry::builtin(
+                workspace.has_usable_skills(),
+                workspace.root.is_some(),
+                mode,
+                entry.supports_vision,
+            );
+            if helper_tools.edits() && offers_chapters(&document) {
+                let run = &chapter_run;
+                tools.add(tools::Tool {
+                    spec: chapters_spec(),
+                    access: tools::Access::Proposes,
+                    modes: tools::EDITING_MODES,
+                    run: tools::Run::Async(Box::new(move |call| Box::pin(run.run(call)))),
+                });
+            }
+            // A document shown whole needs no tools to read it: offered, they were
+            // read again and again instead of edited.
+            if context::shown_whole(&document, true) {
+                tools.remove(tools::SEARCH_TOOL_NAME);
+                tools.remove(tools::READ_DOCUMENT_TOOL_NAME);
+            }
+            if let Some(image_run) = &image_run {
+                tools.add(image_run.tool(
+                    &document,
+                    crate::ai::images::ProposedText {
+                        this_request: &tool_ctx.proposed,
+                        undecided: &undecided,
+                    },
+                    on_event,
+                ));
+            }
+            for tool in web.tools(&focus) {
+                tools.add(tool);
+            }
+            // The user's earlier conversations, when they refer to one.
+            tools.add(search_conversations_tool(&stores.chat));
+            // The tools of the MCP servers the user turned on.
+            #[cfg(desktop)]
+            for tool in crate::mcp::tools_for_request(&app).await {
+                tools.add(tool);
+            }
+            // And of the plugins the user gave ai.tools.
+            for tool in crate::plugins::ai_tools::tools_for_request(&app) {
+                tools.add(tool);
+            }
+            // Create mode reads the plugins installed, to change one.
+            if let Some(tool) = crate::plugins::read_tool::read_plugin_tool(&app) {
+                tools.add(tool);
+            }
             // Pictures written into the text, begun as their lines stream in.
             let inline = image_run.as_ref().map(|run| run.inline(&tool_ctx.proposed));
             let tool_specs = tools.specs();

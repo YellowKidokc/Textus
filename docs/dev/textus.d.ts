@@ -901,25 +901,42 @@ declare global {
     interface Ai {
       /** Local configured provider metadata only; no model request. */
       info(): Promise<{ provider: string; model: string | null }>;
-      /** 1.2: Text from the configured provider in Review mode (ai.request,
-       * editor.read). Uses the active saved document's project instructions,
-       * skills, style and library. Disables every backend tool and does not apply proposals. One
-       * request per plugin, six per minute, 80,000 prompt characters, 120s.
-       * Calls can incur provider charges; token usage is not supplied. */
-      request(options: {
-        id: string;
-        prompt: string;
-        version: string;
-        /** 1.3: Pin to another open saved document (editor.targets). */
-        document?: string;
-        expectedProvider?: string;
-        expectedModel?: string | null;
-      }): Promise<{
+      /** 1.3: What `request` with these options would send, built
+       *  locally with no model request: the fixed instructions, the
+       *  prompt, any other sources (none: no project instructions,
+       *  library, style, memories, skills or document text are added) and
+       *  whether the provider enforces `maxOutputTokens` ("enforced") or
+       *  the cap is only asked for in the prompt ("requested"). Show it as
+       *  the cost preview: `request` sends exactly this. */
+      prepare(options: AiRequestOptions): Promise<AiRequestManifest>;
+      /** 1.2: Text from the configured provider (ai.request, editor.read).
+       * Sends Textus's fixed plugin instructions and `prompt` - nothing
+       * else: put what the model should see in the prompt. No tools, no
+       * proposals. One request per plugin, six per minute, 80,000 prompt
+       * characters, 120s. Calls can incur provider charges; `usage` is the
+       * provider's own count where it reports one (1.3), otherwise null. */
+      request(
+        options: AiRequestOptions & {
+          id: string;
+          version: string;
+          expectedProvider?: string;
+          expectedModel?: string | null;
+        },
+      ): Promise<{
         text: string;
         provider: string;
         model: string | null;
         version: string;
         docPath: string;
+        /** 1.3 */
+        outputLimit: "enforced" | "requested" | "none";
+        /** 1.3: null where the provider doesn't report it. */
+        usage: {
+          inputTokens: number;
+          outputTokens: number;
+          cacheReadInputTokens: number;
+          cacheCreationInputTokens: number;
+        } | null;
       }>;
       /** Cancels only this plugin's matching request. */
       cancel(id: string): Promise<void>;
@@ -929,6 +946,28 @@ declare global {
           args: Record<string, unknown>,
         ) => string | Promise<string> | unknown,
       ): Disposable;
+    }
+
+    interface AiRequestOptions {
+      prompt: string;
+      /** 1.3: Pin to another open saved document (editor.targets). */
+      document?: string;
+      /** 1.3: The reply's cap in tokens, 1 to 32000. */
+      maxOutputTokens?: number;
+    }
+
+    interface AiRequestManifest {
+      provider: string;
+      model: string | null;
+      /** The saved document the reply is for; not sent to the provider. */
+      document: string;
+      instructions: string;
+      prompt: string;
+      /** What else is sent besides instructions and prompt; empty. */
+      sources: string[];
+      inputCharacters: number;
+      maxOutputTokens: number | null;
+      outputLimit: "enforced" | "requested" | "none";
     }
 
     interface Plugins {

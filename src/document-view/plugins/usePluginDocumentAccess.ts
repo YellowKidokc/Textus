@@ -8,6 +8,7 @@ import {
   serializeBlocks,
 } from "../../ai/doc-markdown";
 import {
+  emitPluginEvent,
   setActiveDocument,
   registerDocumentAccess,
   setOpenDocument,
@@ -105,7 +106,12 @@ export function usePluginDocumentAccess({
       reveal: (place) => run((ctx) => revealPlace(ctx, place)) ?? false,
     };
     const remove = registerDocumentAccess(filePath ?? `tab:${tabId}`, access);
-    if (isActive) setActiveDocument(access);
+    if (isActive) {
+      setActiveDocument(access);
+      // The window tells plugins of the new tab before its editor mounts, so
+      // a plugin that read the document then found none: tell them again.
+      emitPluginEvent("activeDocument", { path: filePath });
+    }
     return () => {
       remove();
       if (isActive) setActiveDocument(null, access);

@@ -521,10 +521,22 @@ same file. A published version never changes.
 ### Explicit reviews and pinned native documents (API 1.3)
 
 `ai.info()` reads provider/model metadata from local settings without making a
-model request. Plugins can preview costs using their prompt estimate and
-user-supplied prices; this does not establish an exact bill or a hard spending
-cap. `ai.request` accepts `expectedProvider`/`expectedModel` to reject provider
-changes before a request starts. No credentials cross this interface.
+model request. A plugin request carries only Textus's fixed plugin
+instructions and the plugin's `prompt`: no project instructions, library,
+style profile, memories, skills, document text or tools are added, so whatever
+the model should see goes in the prompt. `ai.prepare()` returns that request
+as a manifest - instructions, prompt, other sources (none), character count
+and output cap - without a model request; preview costs from it, and
+`ai.request` with the same options sends exactly it. A preview is still an
+estimate from user-supplied prices, not an exact bill or a spending cap.
+
+`maxOutputTokens` caps the reply. The manifest's `outputLimit` says whether
+the provider enforces it (`"enforced"`: Claude through the Anthropic API) or
+it is only asked for in the prompt (`"requested"`), where a reply can run
+longer. The reply's `usage` is the provider's own token count where it reports
+one, otherwise null. `ai.request` accepts `expectedProvider`/`expectedModel`
+to reject provider changes before a request starts. No credentials cross this
+interface.
 
 With `editor.targets`, read methods and atomic `edit`/`propose` accept an
 explicit `document` target. `layout.openComparison` creates a native read-only
