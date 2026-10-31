@@ -1,18 +1,23 @@
 import { expect, test, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { openApp } from "./helpers";
 
-execFileSync(process.execPath, ["scripts/build-writing-workbench.mjs"], {
+// Each worker builds into its own folder: a shared one is emptied under the
+// others while they read it.
+const out = mkdtempSync(join(tmpdir(), "textus-workbench-"));
+execFileSync(process.execPath, ["scripts/build-writing-workbench.mjs", out], {
   stdio: "pipe",
 });
 const manifest = JSON.parse(
-  readFileSync("dist-workbench/textus-plugin.json", "utf8"),
+  readFileSync(join(out, "textus-plugin.json"), "utf8"),
 );
 const files = Object.fromEntries(
   ["host.js", "view.html", "inspector.html"].map((file) => [
     file,
-    readFileSync(`dist-workbench/${file}`, "utf8"),
+    readFileSync(join(out, file), "utf8"),
   ]),
 );
 const PATH = "/work/paper.md";
