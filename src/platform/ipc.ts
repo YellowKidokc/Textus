@@ -103,6 +103,30 @@ export {
  */
 
 export const ai = {
+  /** Tool-free selection rewrite: ai/client/selection.rs. */
+  rewriteSelection: (
+    provider: string,
+    model: string | null,
+    selection: string,
+    instruction: string,
+  ) =>
+    aiCall<string>("ai_rewrite_selection", {
+      provider,
+      model,
+      selection,
+      instruction,
+    }),
+  /** Tool-free scoring; contract: ai/client/scoring.rs. */
+  scoreParagraph: (
+    provider: string,
+    model: string | null,
+    paragraph: string,
+    criteria: import("../ai/paragraph-scores").ScoreCriterion[],
+  ) =>
+    aiCall<import("../ai/paragraph-scores").ParagraphScore[]>(
+      "ai_score_paragraph",
+      { provider, model, paragraph, criteria },
+    ),
   // Rust sends the dialect and auth methods as plain strings from fixed sets.
   listProviders: () =>
     command("list_providers") as Promise<ProviderCatalogEntry[]>,

@@ -1,3 +1,4 @@
+import { SideColumns } from "../ui/SideColumns";
 import { isIOSApp } from "../platform/capabilities";
 import { Presence, PresenceDiv, type PresenceHandle } from "../ui/usePresence";
 import { ResizeHandle } from "../ui/ResizeHandle";
@@ -53,6 +54,12 @@ export function Sidebar({
 }) {
   // The tab chosen, or Files for one no longer there.
   const shown = sidebarTab(mode);
+  const columns = [
+    shown,
+    ...sidebarTabs()
+      .filter((tab) => tab.id !== shown.id)
+      .slice(0, 2),
+  ];
   return (
     <>
       {/* iPhone: a tap beside the drawer closes it. */}
@@ -86,18 +93,27 @@ export function Sidebar({
               </div>
             </div>
             <div className="sidebar-body" inert={closing || undefined}>
-              <ViewTitleActions view={shown.id} />
-              <shown.Panel
-                t={t}
-                openFolder={openFolder}
-                activePath={activePath}
-                activeContent={activeContent}
-                onOpenFile={onOpenFile}
-                onClose={onClose}
-                onEntryMoved={onEntryMoved}
-                searchFocusRequest={searchFocusRequest}
-                onSearchFocusHandled={onSearchFocusHandled}
-              />
+              <SideColumns
+                side="left"
+                labels={columns.map((tab) => tab.label(t))}
+              >
+                {columns.map((tab) => (
+                  <div key={tab.id} className="sidebar-column-content">
+                    <ViewTitleActions view={tab.id} />
+                    <tab.Panel
+                      t={t}
+                      openFolder={openFolder}
+                      activePath={activePath}
+                      activeContent={activeContent}
+                      onOpenFile={onOpenFile}
+                      onClose={onClose}
+                      onEntryMoved={onEntryMoved}
+                      searchFocusRequest={searchFocusRequest}
+                      onSearchFocusHandled={onSearchFocusHandled}
+                    />
+                  </div>
+                ))}
+              </SideColumns>
             </div>
             {/* An iPad's sidebar keeps the width the layout gives it. */}
             {!isIOSApp && (

@@ -5,6 +5,63 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Editar ações favoritas",
+  favoriteActions: "Ações favoritas",
+  favoriteAdd: "Adicionar ação",
+  favoriteAcademic: "Tornar mais acadêmico",
+  favoriteAcademicPrompt:
+    "Torne este trecho mais acadêmico e preciso. Preserve o significado e as citações; não invente evidências.",
+  favoriteShorten: "Encurtar",
+  favoriteShortenPrompt:
+    "Encurte este trecho sem perder seu significado ou ressalvas importantes.",
+  favoriteHistory: "Histórico de reescritas",
+  favoriteHistoryHint:
+    "O original, cada versão solicitada e sua escolha final são mantidos. Descartar uma versão não apaga o histórico.",
+  favoriteHistoryEmpty: "Nenhuma reescrita registrada.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Versão",
+  favoritePreviousVersion: "Versão anterior",
+  favoriteNextVersion: "Próxima versão",
+  favoriteKeep: "Manter esta versão",
+  favoriteKept: "Versão escolhida",
+  favoriteDiscarded: "Descartada; original mantido",
+  favoriteUndecided: "Nenhuma escolha final registrada",
+  favoriteInput: "Entrada",
+  favoriteOutput: "Reescrita",
+  favoriteFailed: "Falha na solicitação",
+  favoritePrint: "Imprimir relatório",
+  favoriteExport: "Exportar registro completo",
+  favoriteRecorded: "Reescrita registrada.",
+  favoriteSaveFailed: "Não foi possível salvar a reescrita ou seu histórico.",
+  favoriteChanged:
+    "Selecione um trecho inalterado que não esteja sendo reescrito.",
+  favoriteEmptyReply: "O provedor retornou uma reescrita vazia.",
+
+  writingTools: "Ferramentas de escrita",
+  outlineArrange: "Reorganizar estrutura",
+  outlineArrangeHint:
+    "Mova títulos com seus parágrafos e subseções. O texto fica bloqueado até aplicar ou cancelar. Arraste um título ou use as setas.",
+  outlineLevels: "Níveis de título",
+  outlineMoveUp: "Subir seção",
+  outlineMoveDown: "Descer seção",
+  outlineConflict:
+    "O documento mudou ou está em modo de leitura. Cancele e reabra a estrutura.",
+  scoreParagraphs: "Notas dos parágrafos",
+  scoreHint:
+    "Estimativas de IA, não estatísticas medidas. Cada pedido envia apenas o parágrafo selecionado e seus critérios ao provedor configurado. Pode haver cobrança.",
+  scoreCriteria: "Critérios",
+  scoreName: "Nome",
+  scoreInstruction: "Instrução de avaliação",
+  scoreAdd: "Adicionar critério",
+  scoreRun: "Avaliar parágrafo",
+  scoreClarity: "Clareza",
+  scoreEvidence: "Evidências",
+  scorePersuasion: "Persuasão",
+  scoreAccuracy: "Precisão estatística",
+  scoreEmpty: "Nenhum parágrafo para avaliar.",
+  workspaceColumns: "Colunas",
+  documentSplit: "Dividir coluna do documento",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Ativar ${AI_NAME}`,
   textusAiOffHint: "Desativada: nada é enviado a nenhum serviço de IA.",

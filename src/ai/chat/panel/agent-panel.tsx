@@ -41,8 +41,8 @@ export function useAgentPanel(): AgentPanelFrame {
 }
 
 export const AGENT_PANEL_MIN_WIDTH = 300;
-export const AGENT_PANEL_MAX_WIDTH = 720;
-export const AGENT_PANEL_DEFAULT_WIDTH = 380;
+export const AGENT_PANEL_MAX_WIDTH = 1100;
+export const AGENT_PANEL_DEFAULT_WIDTH = 480;
 
 function clampWidth(width: number): number {
   return Math.min(

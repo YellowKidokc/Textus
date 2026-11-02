@@ -1,3 +1,4 @@
+import { FavoriteRewrites } from "../ai/favorites/FavoriteRewrites";
 import { useEditorSetup } from "./useEditorSetup";
 import { useAskAi } from "../ai/chat/ask-ai";
 import { useEditorChat } from "./useEditorChat";
@@ -103,6 +104,12 @@ export function MilkdownEditor({
       onPointerUp={() => (lastTouchRef.current = Date.now())}
     >
       <Milkdown />
+      {isActive && (
+        <FavoriteRewrites
+          run={setup.run}
+          document={filePath ?? `draft:${tabId}`}
+        />
+      )}
       <EditorMarginLayer
         chat={chat}
         review={review}

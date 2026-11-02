@@ -1,0 +1,565 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 12px;
+        background: var(--ui-bg);
+        color: var(--ui-text);
+        font: var(--text-md) system-ui;
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+        color: inherit;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-border);
+        border-radius: var(--shape-s);
+        padding: 6px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled,
+      .muted {
+        color: var(--ui-muted);
+      }
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 90px;
+      }
+      input:not([type="checkbox"]),
+      select {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin: 8px 0;
+      }
+      .card {
+        border: 1px solid var(--ui-border);
+        border-radius: var(--shape-s);
+        padding: 10px;
+        margin: 8px 0;
+      }
+      p,
+      blockquote {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      blockquote {
+        margin: 8px 0;
+        padding-left: 10px;
+        border-left: 2px solid var(--ui-border);
+      }
+      h2 {
+        font-size: var(--text-lg);
+      }
+      .error {
+        color: var(--ui-danger);
+      }
+      label {
+        display: block;
+        margin: 8px 0;
+      }
+      pre {
+        white-space: pre-wrap;
+      }
+      section[hidden] {
+        display: none;
+      }
+      summary {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navigation" class="row"></div>
+    <p id="target" class="muted"></p>
+    <p id="error" role="status" class="error"></p>
+    <section id="notes">
+      <div id="comparison"></div>
+      <h2 data-t="selectedParagraph"></h2>
+      <blockquote id="paragraph"></blockquote>
+      <div id="noteActions" class="row"></div>
+      <p data-t="notesLegend" class="muted"></p>
+      <div id="findings"></div>
+      <div id="proposals"></div>
+    </section>
+    <section id="reviews" hidden>
+      <h2 data-t="reviewModes"></h2>
+      <label
+        ><span data-t="reviewMode"></span
+        ><select id="mode"></select></label
+      ><label
+        ><span data-t="rubric"></span
+        ><select id="rubric"></select
+      ></label>
+      <details>
+        <summary data-t="rubricJson"></summary>
+        <textarea id="json" aria-label="Rubric JSON"></textarea>
+        <div id="jsonActions" class="row"></div>
+      </details>
+      <label
+        ><span data-t="reviewScope"></span
+        ><select id="scope"></select></label
+      ><label
+        ><span data-t="inputRate"></span
+        ><input id="inputRate" type="number" min="0" step="any" /></label
+      ><label
+        ><span data-t="outputRate"></span
+        ><input id="outputRate" type="number" min="0" step="any" /></label
+      ><label
+        ><span data-t="outputAllowance"></span
+        ><input
+          id="outputTokens"
+          type="number"
+          min="100"
+          max="8000"
+          value="1500"
+      /></label>
+      <p data-t="estimateHelp" class="muted"></p>
+      <div id="reviewActions" class="row"></div>
+      <p id="estimate" role="status"></p>
+      <p id="reviewMessage"></p>
+      <div id="assessments"></div>
+    </section>
+    <section id="builder" hidden>
+      <h2 data-t="templateBuilder"></h2>
+      <p data-t="builderHelp"></p>
+      <input id="file" type="file" accept=".md,.txt,.json" /><textarea
+        id="source"
+        aria-label="Source text"
+      ></textarea>
+      <div id="extractActions" class="row"></div>
+      <div id="candidates"></div>
+      <label
+        ><span data-t="templateName"></span
+        ><input id="name" value="My review" /></label
+      ><label
+        ><span data-t="templateKind"></span
+        ><select id="kind"></select></label
+      ><label
+        ><span data-t="reviewMode"></span
+        ><select id="builderMode"></select></label
+      ><label
+        ><span data-t="scaleMinimum"></span
+        ><input id="min" type="number" value="1" /></label
+      ><label
+        ><span data-t="scaleMaximum"></span
+        ><input id="max" type="number" value="5"
+      /></label>
+      <div id="buildActions" class="row"></div>
+      <textarea id="built" aria-label="Editable template JSON"></textarea>
+      <div id="builtActions" class="row"></div>
+      <p id="templatePreview"></p>
+    </section>
+    <script>
+      const api = acquireTextusApi(),
+        t = (k) => api.t(k),
+        $ = (id) => document.getElementById(id),
+        send = (action, data = {}) => api.postMessage({ action, ...data });
+      let state = null,
+        filename = "source.txt",
+        sourceName = "source.txt",
+        active = api.getState()?.active || "notes",
+        mode = "writing";
+      function node(tag, text, cls) {
+        const el = document.createElement(tag);
+        if (text !== undefined) el.textContent = text;
+        if (cls) el.className = cls;
+        return el;
+      }
+      function button(key, fn, disabled = false) {
+        const b = node("button", t(key));
+        b.type = "button";
+        b.disabled = disabled;
+        b.onclick = fn;
+        return b;
+      }
+      function options(el, items, value) {
+        el.replaceChildren();
+        for (const [id, key] of items) {
+          const o = node("option", t(key));
+          o.value = id;
+          el.append(o);
+        }
+        if (value) el.value = value;
+      }
+      function check(key, value, fn) {
+        const l = node("label"),
+          c = node("input");
+        c.type = "checkbox";
+        c.checked = value;
+        c.onchange = () => fn(c.checked);
+        l.append(c, document.createTextNode(" " + t(key)));
+        return l;
+      }
+      function show(id) {
+        active = id;
+        api.setState({ active });
+        for (const key of ["notes", "reviews", "builder"])
+          $(key).hidden = key !== id;
+      }
+      for (const el of document.querySelectorAll("[data-t]"))
+        el.textContent = t(el.dataset.t);
+      for (const [id, key] of [
+        ["notes", "passageNotes"],
+        ["reviews", "reviewModes"],
+        ["builder", "templateBuilder"],
+      ])
+        $("navigation").append(button(key, () => show(id)));
+      const modes = [
+        ["writing", "writingQuality"],
+        ["argument", "argumentAssessment"],
+        ["grading", "grading"],
+        ["custom", "customReview"],
+      ];
+      options($("mode"), modes, mode);
+      options($("builderMode"), modes, "custom");
+      options($("kind"), [
+        ["rubric", "rubric"],
+        ["plan", "paperTemplate"],
+      ]);
+      options($("scope"), [
+        ["paper", "wholePaper"],
+        ["paragraph", "selectedParagraph"],
+        ["block", "argument"],
+        ["selection", "selectedText"],
+        ["original", "originalSnapshot"],
+      ]);
+      $("mode").onchange = () => {
+        mode = $("mode").value;
+        const r = state?.review.library.find((r) => r.mode === mode);
+        if (r) send("rubricChoose", { id: r.id });
+        render(state);
+      };
+      $("rubric").onchange = () =>
+        send("rubricChoose", { id: $("rubric").value });
+      $("jsonActions").append(
+        button("loadRubric", () =>
+          send("rubricImport", { text: $("json").value }),
+        ),
+        button("exportRubric", () => send("rubricExport")),
+      );
+      function estimate() {
+        send("reviewEstimate", {
+          scope: $("scope").value,
+          inputRate: $("inputRate").value,
+          outputRate: $("outputRate").value,
+          outputTokens: Number($("outputTokens").value),
+        });
+      }
+      $("reviewActions").append(
+        button("estimateCost", estimate),
+        button("runReview", () => send("reviewRun")),
+        button("cancel", () => send("cancel")),
+      );
+      // A preview is invalidated locally when its controls change. Run requires a new estimate.
+      for (const id of ["scope", "inputRate", "outputRate", "outputTokens"])
+        $(id).oninput = () => {
+          $("reviewActions").children[1].disabled = true;
+          $("estimate").textContent = t("estimateFirst");
+          send("reviewInvalidate");
+        };
+      $("file").onchange = async () => {
+        const f = $("file").files[0];
+        if (!f) return;
+        if (f.size > 1000000) {
+          $("error").textContent = t("sourceTooLarge");
+          return;
+        }
+        filename = f.name;
+        $("source").value = await f.text();
+      };
+      $("extractActions").append(
+        button("extractCandidates", () =>
+          send("extractSource", { text: $("source").value, filename }),
+        ),
+        button("loadRubric", () =>
+          send("rubricImport", { text: $("source").value }),
+        ),
+      );
+      $("buildActions").append(
+        button("buildJson", () =>
+          send("buildSourceJson", {
+            selected: [...$("candidates").querySelectorAll("label")]
+              .filter((l) => l.querySelector("input").checked)
+              .map((l) => l.querySelector("textarea").value),
+            filename: sourceName,
+            name: $("name").value,
+            kind: $("kind").value,
+            mode: $("builderMode").value,
+            min: Number($("min").value),
+            max: Number($("max").value),
+          }),
+        ),
+      );
+      $("builtActions").append(
+        button("loadRubric", () =>
+          send("rubricImport", { text: $("built").value }),
+        ),
+        button("copy", () => send("copy", { text: $("built").value })),
+        button("preview", () => send("preview", { text: $("built").value })),
+        button("import", () => send("import", { text: $("built").value })),
+      );
+      function render(s) {
+        if (!s?.review) return;
+        state = s;
+        const r = s.review;
+        $("target").textContent =
+          t("editingTarget") +
+          ": " +
+          (s.comparison?.name || s.path || t("saveFirst"));
+        $("error").textContent = [s.error, s.workspaceError, r.error]
+          .filter(Boolean)
+          .join("\n");
+        $("paragraph").textContent =
+          s.selected?.markdown || t("selectParagraph");
+        const cmp = $("comparison");
+        cmp.replaceChildren();
+        if (s.comparisons?.length) {
+          const saved = node("select");
+          options(
+            saved,
+            s.comparisons.map((c) => [c.id, c.name]),
+            s.comparison?.id,
+          );
+          cmp.append(
+            saved,
+            button("reopenComparison", () =>
+              send("reopenComparison", { id: saved.value }),
+            ),
+          );
+        }
+
+        if (s.comparison) {
+          cmp.append(button("leaveComparison", () => send("leaveComparison")));
+          cmp.append(
+            node(
+              "p",
+              t("originalSnapshot") + " · " + s.comparison.originalVersion,
+              "muted",
+            ),
+            check("referenceOriginal", s.includeOriginal, (on) =>
+              send("referenceOriginal", { on }),
+            ),
+            check("linkedScroll", s.comparison.linked, (on) =>
+              send("comparisonOption", { key: "linked", on }),
+            ),
+            check("paragraphDifferences", s.comparison.differences, (on) =>
+              send("comparisonOption", { key: "differences", on }),
+            ),
+          );
+          const row = node("div", undefined, "row");
+          row.append(
+            button("correspondingOriginal", () =>
+              send("correspondingOriginal"),
+            ),
+            button("copyFromOriginal", () => send("copyOriginal")),
+          );
+          cmp.append(row);
+          const q = node("textarea");
+          q.placeholder = t("questionOriginal");
+          q.setAttribute("aria-label", t("questionOriginal"));
+          cmp.append(
+            q,
+            button(
+              "askOriginal",
+              () => send("askOriginal", { question: q.value }),
+              !s.includeOriginal || !!s.busy,
+            ),
+          );
+          if (s.answer) cmp.append(node("p", s.answer));
+        }
+        $("noteActions").replaceChildren(
+          ...[
+            ["passageAnalyze", "analyzeParagraph"],
+            ["paragraphRewrite", "rewriteParagraph"],
+            ["transitionBridge", "transitionBridge"],
+          ].map(([action, label]) =>
+            button(label, () => send(action), !s.selected || !!s.busy),
+          ),
+          button("cancel", () => send("cancel")),
+        );
+        const findings = $("findings");
+        findings.replaceChildren();
+        for (const run of s.passageRuns || []) {
+          const matches =
+            run.anchor.argument === s.selected?.argument &&
+            run.anchor.markdown === s.selected?.markdown;
+          const card = node(matches ? "div" : "details", undefined, "card");
+          if (!matches)
+            card.append(
+              node("summary", t("savedVersion") + " · " + run.status),
+              node("blockquote", run.anchor.markdown),
+            );
+          card.append(
+            node(
+              "p",
+              run.provider +
+                " · " +
+                (run.model || "") +
+                " · " +
+                run.snapshot.id,
+              "muted",
+            ),
+          );
+          let extra;
+          for (const [i, n] of run.notes.entries()) {
+            const entry = node("div", undefined, "card");
+            entry.append(
+              button(n.category, () => send("revealNote", { id: n.id })),
+              node("p", n.category + " · " + n.status + " · " + n.decision),
+              node("blockquote", n.quote),
+              node("p", n.explanation),
+              node("p", n.uncertainty, "muted"),
+            );
+            const choice = node("select");
+            options(
+              choice,
+              [
+                "provisional",
+                "confirmed",
+                "deferred",
+                "dismissed",
+                "deliberate",
+              ].map((k) => [k, k]),
+              n.decision,
+            );
+            choice.disabled = n.status !== "current";
+            choice.onchange = () =>
+              send("noteDecision", { id: n.id, decision: choice.value });
+            entry.append(choice);
+            if (i < 3) card.append(entry);
+            else {
+              if (!extra) {
+                extra = node("details");
+                extra.append(node("summary", t("moreNotes")));
+                card.append(extra);
+              }
+              extra.append(entry);
+            }
+          }
+          findings.append(card);
+        }
+        const proposals = $("proposals");
+        proposals.replaceChildren();
+        for (const p of s.paper?.passageProposals || []) {
+          if (p.anchor.markdown !== s.selected?.markdown) continue;
+          const d = node("details");
+          d.append(
+            node("summary", t("rewriteAlternative")),
+            node("p", p.reason),
+            node("blockquote", p.text),
+            button(
+              "sendNativeReview",
+              () => send("proposePassage", { id: p.id }),
+              p.sent || p.snapshot.text !== s.text,
+            ),
+          );
+          proposals.append(d);
+        }
+        const current = r.current;
+        if (current.mode !== mode) mode = current.mode;
+        $("mode").value = mode;
+        options(
+          $("rubric"),
+          r.library.filter((x) => x.mode === mode).map((x) => [x.id, x.name]),
+          current.id,
+        );
+        $("reviewActions").children[1].disabled = !r.preview || !!s.busy;
+        $("estimate").textContent = r.preview
+          ? `${r.preview.provider} / ${r.preview.model || ""} · ${t("approximateTokens")}: ${r.preview.inputTokens} + ${r.preview.outputTokens} · ${r.preview.usd === null ? t("unknownCost") : "USD " + r.preview.usd.toFixed(5)}`
+          : t("estimateFirst");
+        $("reviewMessage").textContent = r.message;
+        const assessments = $("assessments");
+        assessments.replaceChildren();
+        for (const a of [...r.assessments].reverse()) {
+          const d = node("details");
+          d.append(
+            node(
+              "summary",
+              a.rubric.name +
+                " · " +
+                a.scope +
+                " · " +
+                (a.documentText === s.text
+                  ? t("currentVersion")
+                  : t("savedVersion")),
+            ),
+            node(
+              "p",
+              a.provider +
+                " · " +
+                (a.model || "") +
+                " · " +
+                a.at +
+                " · " +
+                a.version,
+              "muted",
+            ),
+          );
+          for (const result of a.results)
+            d.append(
+              node(
+                "h3",
+                a.rubric.criteria.find((c) => c.id === result.criterion)?.title,
+              ),
+              node(
+                "p",
+                result.score === null ? t("unscored") : String(result.score),
+              ),
+              node("blockquote", result.quote),
+              node("p", result.explanation),
+              node("p", result.uncertainty, "muted"),
+            );
+          assessments.append(d);
+        }
+      }
+      window.addEventListener("message", (event) => {
+        const m = event.data;
+        if (m.rubricJson) {
+          $("json").value = m.rubricJson;
+          return;
+        }
+        if (m.builtJson) {
+          $("built").value = m.builtJson;
+          return;
+        }
+        if (m.candidates) {
+          sourceName = m.sourceName;
+          $("candidates").replaceChildren();
+          for (const text of m.candidates) {
+            const l = node("label"),
+              c = node("input"),
+              edit = node("textarea");
+            c.type = "checkbox";
+            c.checked = true;
+            edit.value = text;
+            l.append(c, edit);
+            $("candidates").append(l);
+          }
+          return;
+        }
+        if (m.preview) {
+          $("templatePreview").textContent =
+            t("preview") + ": " + m.preview.blocks.length;
+          return;
+        }
+        render(m);
+      });
+      show(active);
+      send("refresh");
+    </script>
+  </body>
+</html>

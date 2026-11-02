@@ -42,3 +42,7 @@ pub mod vault;
 #[cfg(desktop)]
 pub mod web_page;
 pub mod word_import;
+
+pub mod rewrite_history;
+
+mod rewrite_journal_store;

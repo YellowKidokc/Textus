@@ -5,6 +5,61 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "즐겨찾기 작업 편집",
+  favoriteActions: "즐겨찾기 작업",
+  favoriteAdd: "작업 추가",
+  favoriteAcademic: "학술적으로 다듬기",
+  favoriteAcademicPrompt:
+    "이 글을 더 학술적이고 정확하게 다듬으세요. 의미와 인용을 유지하고 근거를 만들어내지 마세요.",
+  favoriteShorten: "줄이기",
+  favoriteShortenPrompt: "의미와 중요한 단서를 잃지 않도록 이 글을 줄이세요.",
+  favoriteHistory: "재작성 기록",
+  favoriteHistoryHint:
+    "원문, 요청한 모든 버전과 최종 선택을 보관합니다. 재작성을 버려도 기록은 삭제되지 않습니다.",
+  favoriteHistoryEmpty: "아직 재작성 기록이 없습니다.",
+  favoriteOriginal: "원문",
+  favoriteVersions: "버전",
+  favoritePreviousVersion: "이전 버전",
+  favoriteNextVersion: "다음 버전",
+  favoriteKeep: "이 버전 유지",
+  favoriteKept: "선택한 버전",
+  favoriteDiscarded: "버림; 원문 유지",
+  favoriteUndecided: "최종 선택 기록 없음",
+  favoriteInput: "입력",
+  favoriteOutput: "재작성",
+  favoriteFailed: "요청 실패",
+  favoritePrint: "보고서 인쇄",
+  favoriteExport: "전체 기록 내보내기",
+  favoriteRecorded: "재작성을 기록했습니다.",
+  favoriteSaveFailed: "재작성 또는 기록을 저장하지 못했습니다.",
+  favoriteChanged: "변경되지 않았고 재작성 중이 아닌 글을 선택하세요.",
+  favoriteEmptyReply: "제공업체가 빈 재작성을 반환했습니다.",
+
+  writingTools: "글쓰기 도구",
+  outlineArrange: "개요 재배열",
+  outlineArrangeHint:
+    "제목과 해당 문단 및 하위 절을 함께 이동합니다. 적용하거나 취소할 때까지 본문은 잠깁니다. 제목을 끌거나 화살표 버튼을 사용하세요.",
+  outlineLevels: "제목 수준",
+  outlineMoveUp: "절 위로 이동",
+  outlineMoveDown: "절 아래로 이동",
+  outlineConflict:
+    "문서가 변경되었거나 읽기 전용입니다. 취소한 뒤 개요를 다시 여세요.",
+  scoreParagraphs: "문단 점수",
+  scoreHint:
+    "AI 추정치이며 측정된 통계가 아닙니다. 선택한 문단과 평가 기준만 설정된 AI 제공업체에 전송됩니다. 요금이 발생할 수 있습니다.",
+  scoreCriteria: "평가 기준",
+  scoreName: "이름",
+  scoreInstruction: "평가 지침",
+  scoreAdd: "기준 추가",
+  scoreRun: "문단 평가",
+  scoreClarity: "명확성",
+  scoreEvidence: "근거",
+  scorePersuasion: "설득력",
+  scoreAccuracy: "통계적 정확성",
+  scoreEmpty: "평가할 문단이 없습니다.",
+  workspaceColumns: "열 수",
+  documentSplit: "문서 열 분할",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `${AI_NAME} 사용`,
   textusAiOffHint:

@@ -1,0 +1,514 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 12px;
+        color: var(--ui-text);
+        background: var(--ui-bg);
+        font: var(--text-md) system-ui;
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+      button,
+      select {
+        min-height: 28px;
+        border: 1px solid var(--ui-border);
+        border-radius: var(--shape-pill);
+        background: var(--ui-surface);
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+      button:disabled {
+        color: var(--ui-muted);
+        cursor: default;
+      }
+      button:hover:not(:disabled) {
+        background: var(--ui-hover);
+      }
+      input,
+      textarea {
+        box-sizing: border-box;
+        width: 100%;
+        border: 1px solid var(--ui-border);
+        border-radius: var(--shape-s);
+        padding: 8px;
+        background: var(--ui-surface);
+      }
+      textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+      :focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+      }
+      h1 {
+        font-size: var(--text-xl);
+        margin: 0 0 12px;
+      }
+      h2 {
+        font-size: var(--text-lg);
+        margin: 16px 0 8px;
+      }
+      p {
+        margin: 8px 0;
+        overflow-wrap: anywhere;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        margin: 8px 0;
+      }
+      .card {
+        padding: 8px;
+        border: 1px solid var(--ui-border);
+        border-radius: var(--shape-m);
+        margin: 8px 0;
+      }
+      .muted {
+        color: var(--ui-muted);
+        font-size: var(--text-sm);
+      }
+      .error {
+        color: var(--ui-danger);
+        white-space: pre-wrap;
+      }
+      blockquote {
+        margin: 8px 0;
+        border-left: 2px solid var(--ui-accent);
+        padding-left: 8px;
+        white-space: pre-wrap;
+      }
+      label {
+        display: block;
+        margin: 8px 0;
+      }
+      label input[type="checkbox"] {
+        width: auto;
+        margin-right: 8px;
+      }
+      pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font: inherit;
+      }
+      summary {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="title"></h1>
+    <div id="controls"></div>
+    <p id="status" class="muted"></p>
+    <p id="error" class="error"></p>
+    <div id="workspaceActions" class="row"></div>
+    <div id="plan"></div>
+    <div id="coverage"></div>
+    <div id="rewrites"></div>
+    <details id="templates">
+      <summary id="templateTitle"></summary>
+      <p id="templateHelp" class="muted"></p>
+      <textarea id="templateText"></textarea>
+      <div id="templateActions" class="row"></div>
+      <div id="preview"></div>
+    </details>
+    <details>
+      <summary id="historyTitle"></summary>
+      <div id="history"></div>
+    </details>
+    <script>
+      const api = acquireTextusApi();
+      const t = (key) => api.t(key);
+      const $ = (id) => document.getElementById(id);
+      const send = (action, data = {}) => api.postMessage({ action, ...data });
+      for (const [action, label] of [
+        ["reviseBeside", "reviseBeside"],
+        ["openNotes", "passageNotes"],
+        ["focusWriting", "focusWriting"],
+      ])
+        $("workspaceActions").append(button(label, () => send(action)));
+      let selected = api.getState()?.selected || "";
+      let state;
+      function node(tag, text, cls) {
+        const el = document.createElement(tag);
+        if (text !== undefined) el.textContent = text;
+        if (cls) el.className = cls;
+        return el;
+      }
+      function button(label, action, disabled = false) {
+        const b = node("button", t(label));
+        b.type = "button";
+        b.disabled = disabled;
+        b.onclick = action;
+        return b;
+      }
+      function heading(where, text) {
+        where.append(node("h2", t(text)));
+      }
+      function current(source) {
+        return (
+          source.text === state.text &&
+          source.plan ===
+            JSON.stringify([
+              state.paper.intent,
+              state.paper.blocks.map((b) => ({
+                id: b.id,
+                purpose: b.purpose,
+                dependsOn: b.dependsOn,
+                intentions: b.intentions.map(({ id, component }) => ({
+                  id,
+                  component,
+                })),
+              })),
+            ])
+        );
+      }
+      function name(id) {
+        return state.components.find((c) => c.id === id)?.name || id;
+      }
+      function row(...children) {
+        const el = node("div", undefined, "row");
+        el.append(...children);
+        return el;
+      }
+      function decisionControls(block, intention, disabled = false) {
+        const select = node("select");
+        select.setAttribute(
+          "aria-label",
+          name(intention.component) + " · " + t("decision"),
+        );
+        for (const value of [
+          "planned",
+          "confirmed",
+          "deferred",
+          "dismissed",
+          "unnecessary",
+        ]) {
+          const o = node("option", t(value));
+          o.value = value;
+          select.append(o);
+        }
+        select.value = intention.decision;
+        select.disabled = disabled;
+        select.onchange = () =>
+          send("decide", { block, id: intention.id, decision: select.value });
+        return select;
+      }
+      function render(s) {
+        const expanded = new Map(
+          [...document.querySelectorAll("details[data-record]")].map((el) => [
+            el.dataset.record,
+            el.open,
+          ]),
+        );
+        state = s;
+        $("title").textContent = t("name");
+        $("error").textContent = s.error;
+        $("status").textContent = s.busy
+          ? t("running")
+          : s.saved
+            ? t("saved")
+            : t("saveFirst");
+        const controls = $("controls");
+        controls.replaceChildren(
+          row(
+            button("new", () => send("new")),
+            button("add", () => send("add"), !s.paper || !!s.busy),
+            button(
+              "analyze",
+              () => send("analyze"),
+              !s.paper || !s.blocks.length || !!s.busy,
+            ),
+            button("cancel", () => send("cancel"), !s.busy),
+          ),
+        );
+        controls.append(node("p", t("cost"), "muted"));
+        const plan = $("plan");
+        plan.replaceChildren();
+        $("coverage").replaceChildren();
+        $("rewrites").replaceChildren();
+        $("history").replaceChildren();
+        if (!s.paper) {
+          plan.append(node("p", t("openFolder")));
+          return;
+        }
+        const intentLabel = node("label", t("intent"));
+        const intent = node("textarea");
+        intent.value = s.paper.intent;
+        intent.onblur = () => {
+          if (intent.value !== s.paper.intent)
+            send("intent", { value: intent.value });
+        };
+        intentLabel.append(intent);
+        plan.append(intentLabel);
+        heading(plan, "spine");
+        for (const problem of s.dependencyProblems)
+          plan.append(node("p", problem, "error"));
+        const ids = s.blocks.map((b) => b.id);
+        if (!ids.includes(selected)) selected = ids[0] || "";
+        for (const [index, span] of s.blocks.entries()) {
+          const b = s.paper.blocks.find((b) => b.id === span.id);
+          const card = node("div", undefined, "card");
+          if (!b) {
+            card.append(node("p", t("unresolved")));
+            plan.append(card);
+            continue;
+          }
+          const pick = button("argument", () => {
+            selected = b.id;
+            api.setState({ selected });
+            render(state);
+          });
+          pick.textContent = index + 1 + ". " + (b.purpose || t("argument"));
+          pick.setAttribute("aria-pressed", String(selected === b.id));
+          card.append(
+            row(
+              pick,
+              button(
+                "up",
+                () => send("move", { block: b.id, delta: -1 }),
+                index === 0 || !!s.busy,
+              ),
+              button(
+                "down",
+                () => send("move", { block: b.id, delta: 1 }),
+                index === s.blocks.length - 1 || !!s.busy,
+              ),
+            ),
+          );
+          if (selected === b.id) {
+            const label = node("label", t("purpose"));
+            const purpose = node("input");
+            purpose.value = b.purpose;
+            purpose.onblur = () => {
+              if (purpose.value !== b.purpose)
+                send("purpose", { block: b.id, value: purpose.value });
+            };
+            label.append(purpose);
+            card.append(label);
+            const searchLabel = node("label", t("search"));
+            const search = node("input");
+            search.type = "search";
+            searchLabel.append(search);
+            card.append(searchLabel);
+            const library = node("div");
+            for (const family of ["job", "technique", "presentation"]) {
+              const group = node("div");
+              group.append(node("p", t(family)));
+              for (const c of s.components.filter((c) => c.family === family)) {
+                const label = node("label");
+                label.dataset.search = (c.name + " " + c.purpose).toLowerCase();
+                const check = node("input");
+                check.type = "checkbox";
+                check.checked = b.intentions.some((i) => i.component === c.id);
+                check.onchange = () =>
+                  send("choose", {
+                    block: b.id,
+                    component: c.id,
+                    selected: check.checked,
+                  });
+                label.append(check, document.createTextNode(c.name));
+                label.title =
+                  c.purpose + " " + c.limitations + " " + c.provenance;
+                group.append(label);
+              }
+              library.append(group);
+            }
+            search.oninput = () => {
+              for (const item of library.querySelectorAll("label"))
+                item.hidden = !item.dataset.search.includes(
+                  search.value.toLowerCase(),
+                );
+            };
+            card.append(library);
+            card.append(
+              button(
+                "rewrite",
+                () => send("rewrite", { block: b.id }),
+                !!s.busy || !span.text.trim(),
+              ),
+            );
+          }
+          plan.append(card);
+        }
+        for (const b of s.paper.blocks.filter((b) => !ids.includes(b.id)))
+          plan.append(node("p", t("unresolved") + " " + b.purpose, "error"));
+        const coverage = $("coverage");
+        heading(coverage, "coverage");
+        coverage.append(node("p", t("provisionalHelp"), "muted"));
+        for (const family of ["job", "technique", "presentation"]) {
+          heading(
+            coverage,
+            family === "job"
+              ? "openJobs"
+              : family === "technique"
+                ? "optional"
+                : "presentation",
+          );
+          for (const b of s.paper.blocks)
+            for (const i of b.intentions.filter(
+              (i) =>
+                s.components.find((c) => c.id === i.component)?.family ===
+                family,
+            )) {
+              const body = s.blocks.find((span) => span.id === b.id)?.text;
+              const confirmed = i.decision === "confirmed" && i.text === body;
+              const card = node("div", undefined, "card");
+              card.append(
+                node(
+                  "p",
+                  (b.purpose || t("argument")) + " · " + name(i.component),
+                ),
+              );
+              card.append(
+                node(
+                  "p",
+                  i.decision === "confirmed" && !confirmed
+                    ? t("staleConfirmation")
+                    : t(i.decision),
+                  "muted",
+                ),
+                decisionControls(b.id, i, !body),
+              );
+              if (
+                ["planned", "deferred"].includes(i.decision) &&
+                selected &&
+                selected !== b.id
+              )
+                card.append(
+                  button("carry", () =>
+                    send("carry", { from: b.id, id: i.id, to: selected }),
+                  ),
+                );
+              coverage.append(card);
+            }
+        }
+        for (const run of s.paper.analyses) {
+          const details = node("details");
+          const live = current(run.snapshot);
+          details.open = run === s.paper.analyses[s.paper.analyses.length - 1];
+          details.append(
+            node(
+              "summary",
+              t(live ? "completed" : "stale") +
+                " · " +
+                run.provider +
+                " · " +
+                run.snapshot.id.slice(0, 8),
+            ),
+          );
+          if (!run.findings.length) details.append(node("p", t("noFindings")));
+          for (const f of run.findings) {
+            const card = node("div", undefined, "card");
+            card.append(
+              node("p", name(f.component)),
+              node("blockquote", f.quote),
+              node("p", f.explanation),
+              node("p", f.uncertainty, "muted"),
+            );
+            const intention = s.paper.blocks
+              .find((b) => b.id === f.block)
+              ?.intentions.find((i) => i.component === f.component);
+            if (intention)
+              card.append(decisionControls(f.block, intention, !live));
+            details.append(card);
+          }
+          coverage.append(details);
+        }
+        heading($("rewrites"), "rewrites");
+        for (const p of s.paper.proposals) {
+          const card = node("details");
+          card.dataset.record = p.id;
+          card.open = expanded.get(p.id) ?? false;
+          card.append(
+            node("summary", t("rewrite") + " · " + p.provider),
+            node("p", t("original")),
+            node("pre", p.original),
+            node("p", t("proposed")),
+            node("pre", p.proposed),
+            node("p", p.reason),
+            button(
+              "reviewNative",
+              () => send("propose", { id: p.id }),
+              !current(p.snapshot) ||
+                s.paper.history.some(
+                  (h) =>
+                    h.action === "rewrite-sent-to-native-review" &&
+                    h.target === p.id,
+                ),
+            ),
+          );
+          if (!current(p.snapshot)) card.append(node("p", t("stale"), "muted"));
+          $("rewrites").append(card);
+        }
+        for (const h of s.paper.history.slice().reverse())
+          $("history").append(
+            node(
+              "p",
+              h.at + " · " + h.action + " · " + h.target.slice(0, 8),
+              "muted",
+            ),
+          );
+      }
+      $("templateTitle").textContent = t("templates");
+      $("templateHelp").textContent = t("templateHelp");
+      $("templateText").setAttribute("aria-label", t("templateJson"));
+      $("historyTitle").textContent = t("history");
+      $("templateActions").append(
+        button("export", () => send("export")),
+        button("copy", () => send("copy", { text: $("templateText").value })),
+        button("preview", () =>
+          send("preview", { text: $("templateText").value }),
+        ),
+        button("import", () =>
+          send("import", { text: $("templateText").value }),
+        ),
+      );
+      api.onMessage((m) => {
+        if (m.template !== undefined) {
+          $("templateText").value = m.template;
+          $("templates").open = true;
+          return;
+        }
+        if (m.preview) {
+          const preview = $("preview");
+          preview.replaceChildren(
+            node(
+              "p",
+              t("preview") +
+                ": " +
+                m.preview.blocks.length +
+                " · " +
+                m.preview.id,
+            ),
+          );
+          for (const block of m.preview.blocks) {
+            const card = node("div", undefined, "card");
+            card.append(
+              node("p", block.purpose || t("argument")),
+              node("p", block.components.map(name).join(" · "), "muted"),
+            );
+            if (block.dependsOn.length)
+              card.append(node("p", block.dependsOn.join(" → "), "muted"));
+            preview.append(card);
+          }
+          return;
+        }
+        render(m);
+      });
+      send("refresh");
+    </script>
+  </body>
+</html>

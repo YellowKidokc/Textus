@@ -1,0 +1,97 @@
+.writing-launcher {
+  position: absolute;
+  inset-inline-end: 12px;
+  bottom: 8px;
+  z-index: 6;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-m);
+}
+.writing-launcher button,
+.writing-dialog button,
+.side-columns button,
+.paragraph-scores button {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-pill);
+  padding: 4px 12px;
+  font-size: var(--text-caption);
+  cursor: pointer;
+}
+.writing-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--ui-bg);
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+}
+.writing-dialog {
+  width: min(100%, 960px);
+  padding: 24px;
+  box-sizing: border-box;
+  outline: none;
+  color: var(--ui-text);
+  font-size: var(--text-body);
+}
+.writing-dialog :is(header, nav, footer) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.writing-dialog header {
+  justify-content: space-between;
+}
+.writing-dialog h2 {
+  font-size: var(--text-title);
+}
+.writing-levels {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid var(--ui-border);
+}
+.writing-outline {
+  list-style: none;
+  padding: 0;
+}
+.writing-outline li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--ui-border);
+  padding-block: 12px;
+}
+.writing-outline li span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.writing-dialog button:disabled,
+.paragraph-scores button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+@media (max-width: 700px) {
+  .writing-launcher {
+    position: fixed;
+    bottom: 8px;
+    max-width: calc(100% - 24px);
+    flex-wrap: wrap;
+  }
+  .writing-dialog {
+    padding: 12px;
+  }
+}
+@media print {
+  .writing-launcher {
+    display: none;
+  }
+}

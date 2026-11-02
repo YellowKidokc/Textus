@@ -166,6 +166,7 @@ function App() {
 
         {agentPresence.mounted && (
           <AgentPanelDock
+            activeContent={activeTab.content}
             presence={agentPresence}
             closing={agentClosing}
             sheetFull={sheetFull}

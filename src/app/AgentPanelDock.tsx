@@ -1,3 +1,8 @@
+import { SideColumns } from "../ui/SideColumns";
+import { Suspense } from "react";
+import { lazyComponent } from "../lazy/lazy-component";
+import { lazyModule } from "../lazy/lazy-module";
+import { Outline } from "../sidebar/Outline";
 import { isIOSApp } from "../platform/capabilities";
 import type { PresenceHandle } from "../ui/usePresence";
 import {
@@ -10,9 +15,15 @@ import { ResizeHandle } from "../ui/ResizeHandle";
 import type { Strings } from "../i18n/strings";
 import { TextusAiOffNote } from "../ai/TextusAiSwitch";
 
+const ParagraphScores = lazyComponent(
+  lazyModule("paragraph-scores", () => import("../ai/ParagraphScores")),
+  (m) => m.ParagraphScores,
+);
+
 /** The docked Agent panel's frame (a bottom sheet on a phone); the active
  *  tab's editor renders its conversation into the mount point here. */
 export function AgentPanelDock({
+  activeContent,
   presence,
   closing,
   sheetFull,
@@ -26,6 +37,7 @@ export function AgentPanelDock({
   aiOn,
   t,
 }: {
+  activeContent: string;
   presence: PresenceHandle;
   closing: boolean;
   sheetFull: boolean;
@@ -71,7 +83,16 @@ export function AgentPanelDock({
         onReset={() => onResize(AGENT_PANEL_DEFAULT_WIDTH, true)}
         label={t.agentPanelResize}
       />
-      <div className="agent-panel-mount" ref={mountRef} />
+      <SideColumns
+        side="right"
+        labels={[t.agentPanelTitle, t.scoreParagraphs, t.outlineTab]}
+      >
+        <div className="agent-panel-mount" ref={mountRef} />
+        <Suspense fallback={null}>
+          <ParagraphScores content={activeContent} />
+        </Suspense>
+        <Outline content={activeContent} />
+      </SideColumns>
       {/* Source mode, split view and AI off have no conversation, so say so
         instead of an empty column. */}
       {!aiOn && <TextusAiOffNote className="agent-panel-placeholder" />}

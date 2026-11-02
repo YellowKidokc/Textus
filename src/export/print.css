@@ -155,3 +155,28 @@
   font-size: var(--text-body-large);
   font-weight: 600;
 }
+
+/* Rewrite reports print their complete local history instead of the editor. */
+@media print {
+  body:has(.favorite-history) > :not(.favorite-history-backdrop) {
+    display: none !important;
+  }
+  .favorite-history-backdrop {
+    position: static;
+    overflow: visible;
+    background: white;
+  }
+  .favorite-history {
+    max-width: none;
+    color: black;
+  }
+  .favorite-history header button,
+  .favorite-launcher,
+  .favorite-selection-actions,
+  .favorite-version-controls {
+    display: none !important;
+  }
+  .favorite-history article {
+    break-inside: avoid;
+  }
+}

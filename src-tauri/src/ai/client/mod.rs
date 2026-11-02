@@ -7,8 +7,13 @@ use tauri::AppHandle;
 
 mod completion;
 mod grammar;
+mod selection;
+pub(crate) use selection::*;
+mod scoring;
+mod scoring_contract;
 pub(crate) use completion::*;
 pub(crate) use grammar::*;
+pub(crate) use scoring::*;
 
 /// `model` overrides the provider's default model; inline completion always
 /// passes `None`. Dispatches by dialect.

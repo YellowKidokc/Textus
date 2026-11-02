@@ -7,6 +7,64 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Modifier les actions favorites",
+  favoriteActions: "Actions favorites",
+  favoriteAdd: "Ajouter une action",
+  favoriteAcademic: "Rendre plus académique",
+  favoriteAcademicPrompt:
+    "Rendez ce passage plus académique et précis. Préservez le sens et les citations sans inventer de preuves.",
+  favoriteShorten: "Raccourcir",
+  favoriteShortenPrompt:
+    "Raccourcissez ce passage sans perdre son sens ni ses nuances importantes.",
+  favoriteHistory: "Historique des réécritures",
+  favoriteHistoryHint:
+    "L’original, chaque version demandée et votre choix final sont conservés. Rejeter une version ne supprime pas son historique.",
+  favoriteHistoryEmpty: "Aucune réécriture enregistrée.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Version",
+  favoritePreviousVersion: "Version précédente",
+  favoriteNextVersion: "Version suivante",
+  favoriteKeep: "Garder cette version",
+  favoriteKept: "Version retenue",
+  favoriteDiscarded: "Rejetée ; original conservé",
+  favoriteUndecided: "Aucun choix final enregistré",
+  favoriteInput: "Entrée",
+  favoriteOutput: "Réécriture",
+  favoriteFailed: "Échec de la demande",
+  favoritePrint: "Imprimer le rapport",
+  favoriteExport: "Exporter le registre complet",
+  favoriteRecorded: "Réécriture enregistrée.",
+  favoriteSaveFailed:
+    "La réécriture ou son historique n’a pas pu être enregistré.",
+  favoriteChanged:
+    "Sélectionnez un passage inchangé qui n’est pas déjà en cours de réécriture.",
+  favoriteEmptyReply: "Le fournisseur a renvoyé une réécriture vide.",
+
+  writingTools: "Outils de rédaction",
+  outlineArrange: "Réorganiser le plan",
+  outlineArrangeHint:
+    "Déplacez les titres avec leurs paragraphes et sous-sections. Le texte reste verrouillé jusqu’à validation ou annulation. Glissez un titre ou utilisez les flèches.",
+  outlineLevels: "Niveaux de titre",
+  outlineMoveUp: "Monter la section",
+  outlineMoveDown: "Descendre la section",
+  outlineConflict:
+    "Le document a changé ou est en lecture seule. Annulez et rouvrez le plan.",
+  scoreParagraphs: "Notes des paragraphes",
+  scoreHint:
+    "Estimations de l’IA, pas des statistiques mesurées. Chaque demande envoie seulement le paragraphe choisi et vos critères au fournisseur configuré. Des frais peuvent s’appliquer.",
+  scoreCriteria: "Critères",
+  scoreName: "Nom",
+  scoreInstruction: "Consigne de notation",
+  scoreAdd: "Ajouter un critère",
+  scoreRun: "Évaluer le paragraphe",
+  scoreClarity: "Clarté",
+  scoreEvidence: "Preuves",
+  scorePersuasion: "Persuasion",
+  scoreAccuracy: "Exactitude statistique",
+  scoreEmpty: "Aucun paragraphe à évaluer.",
+  workspaceColumns: "Colonnes",
+  documentSplit: "Diviser la colonne du document",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Activer ${AI_NAME}`,
   textusAiOffHint: "Désactivée : rien n'est envoyé à aucun service d'IA.",

@@ -8,6 +8,11 @@ import { trackWrite } from "./pending-writes";
  * into open windows; values come back untrusted, so callers validate.
  */
 export interface UiState {
+  favoriteActions: unknown;
+  paragraphCriteria: unknown;
+  sideColumns: Partial<
+    Record<"left" | "right", { count: number; sizes: number[] }>
+  >;
   /** The onboarding tour's step. */
   tutorialProgress: unknown;
   agentPanelOpen: boolean;
@@ -98,6 +103,21 @@ const LOCAL: {
     key: "textus-agent-panel-width",
     decode: (raw) => Number(raw),
     encode: (value) => String(Math.round(value)),
+  },
+  favoriteActions: {
+    key: "textus-favorite-actions",
+    decode: JSON.parse,
+    encode: JSON.stringify,
+  },
+  paragraphCriteria: {
+    key: "textus-paragraph-criteria",
+    decode: JSON.parse,
+    encode: JSON.stringify,
+  },
+  sideColumns: {
+    key: "textus-side-columns",
+    decode: JSON.parse,
+    encode: JSON.stringify,
   },
   sidebarWidth: {
     key: "textus-sidebar-width",

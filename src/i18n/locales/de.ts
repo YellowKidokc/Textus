@@ -5,6 +5,64 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Favoriten bearbeiten",
+  favoriteActions: "Favoritenaktionen",
+  favoriteAdd: "Aktion hinzufügen",
+  favoriteAcademic: "Akademischer formulieren",
+  favoriteAcademicPrompt:
+    "Formuliere diesen Abschnitt akademischer und präziser. Bewahre Bedeutung und Quellenangaben; erfinde keine Belege.",
+  favoriteShorten: "Kürzen",
+  favoriteShortenPrompt:
+    "Kürze diesen Abschnitt ohne Bedeutung oder wichtige Einschränkungen zu verlieren.",
+  favoriteHistory: "Überarbeitungsverlauf",
+  favoriteHistoryHint:
+    "Das Original, jede angeforderte Version und deine endgültige Wahl bleiben erhalten. Verwerfen löscht den Verlauf nicht.",
+  favoriteHistoryEmpty: "Noch keine Überarbeitungen aufgezeichnet.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Version",
+  favoritePreviousVersion: "Vorherige Version",
+  favoriteNextVersion: "Nächste Version",
+  favoriteKeep: "Diese Version behalten",
+  favoriteKept: "Gewählte Version",
+  favoriteDiscarded: "Verworfen; Original behalten",
+  favoriteUndecided: "Keine endgültige Wahl aufgezeichnet",
+  favoriteInput: "Eingabe",
+  favoriteOutput: "Überarbeitung",
+  favoriteFailed: "Anfrage fehlgeschlagen",
+  favoritePrint: "Bericht drucken",
+  favoriteExport: "Vollständigen Verlauf exportieren",
+  favoriteRecorded: "Überarbeitung aufgezeichnet.",
+  favoriteSaveFailed:
+    "Überarbeitung oder Verlauf konnten nicht gespeichert werden.",
+  favoriteChanged:
+    "Wähle einen unveränderten Abschnitt, der nicht bereits überarbeitet wird.",
+  favoriteEmptyReply: "Der Anbieter hat eine leere Überarbeitung geliefert.",
+
+  writingTools: "Schreibwerkzeuge",
+  outlineArrange: "Gliederung umordnen",
+  outlineArrangeHint:
+    "Verschiebe Überschriften mit ihren Absätzen und Unterabschnitten. Der Text bleibt bis zum Anwenden oder Abbrechen gesperrt. Ziehe eine Überschrift oder nutze die Pfeiltasten.",
+  outlineLevels: "Überschriftenebenen",
+  outlineMoveUp: "Abschnitt nach oben",
+  outlineMoveDown: "Abschnitt nach unten",
+  outlineConflict:
+    "Das Dokument wurde geändert oder ist schreibgeschützt. Abbrechen und Gliederung erneut öffnen.",
+  scoreParagraphs: "Absatzbewertungen",
+  scoreHint:
+    "KI-Schätzungen, keine gemessenen Statistiken. Jede Anfrage sendet nur den gewählten Absatz und deine Kriterien an den eingerichteten Anbieter. Es können Kosten entstehen.",
+  scoreCriteria: "Kriterien",
+  scoreName: "Name",
+  scoreInstruction: "Bewertungsanweisung",
+  scoreAdd: "Kriterium hinzufügen",
+  scoreRun: "Absatz bewerten",
+  scoreClarity: "Klarheit",
+  scoreEvidence: "Belege",
+  scorePersuasion: "Überzeugungskraft",
+  scoreAccuracy: "Statistische Genauigkeit",
+  scoreEmpty: "Keine Absätze zu bewerten.",
+  workspaceColumns: "Spalten",
+  documentSplit: "Dokumentspalte teilen",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `${AI_NAME} aktivieren`,
   textusAiOffHint: "Aus: Es wird nichts an einen KI-Dienst gesendet.",

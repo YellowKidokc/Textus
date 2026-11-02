@@ -5,6 +5,63 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Editar acciones favoritas",
+  favoriteActions: "Acciones favoritas",
+  favoriteAdd: "Añadir acción",
+  favoriteAcademic: "Hacer más académico",
+  favoriteAcademicPrompt:
+    "Haz este pasaje más académico y preciso. Conserva el significado y las citas sin inventar evidencia.",
+  favoriteShorten: "Acortar",
+  favoriteShortenPrompt:
+    "Acorta este pasaje sin perder su significado ni matices importantes.",
+  favoriteHistory: "Historial de reescrituras",
+  favoriteHistoryHint:
+    "Se conservan el original, cada versión solicitada y la elección final. Descartar una versión no borra su historial.",
+  favoriteHistoryEmpty: "Aún no hay reescrituras registradas.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Versión",
+  favoritePreviousVersion: "Versión anterior",
+  favoriteNextVersion: "Versión siguiente",
+  favoriteKeep: "Conservar esta versión",
+  favoriteKept: "Versión elegida",
+  favoriteDiscarded: "Descartada; original conservado",
+  favoriteUndecided: "Sin elección final registrada",
+  favoriteInput: "Entrada",
+  favoriteOutput: "Reescritura",
+  favoriteFailed: "Solicitud fallida",
+  favoritePrint: "Imprimir informe",
+  favoriteExport: "Exportar registro completo",
+  favoriteRecorded: "Reescritura registrada.",
+  favoriteSaveFailed: "No se pudo guardar la reescritura o su historial.",
+  favoriteChanged:
+    "Selecciona un pasaje sin cambios que no se esté reescribiendo.",
+  favoriteEmptyReply: "El proveedor devolvió una reescritura vacía.",
+
+  writingTools: "Herramientas de escritura",
+  outlineArrange: "Reorganizar esquema",
+  outlineArrangeHint:
+    "Mueve los títulos con sus párrafos y subsecciones. El texto queda bloqueado hasta aplicar o cancelar. Arrastra un título o usa las flechas.",
+  outlineLevels: "Niveles de título",
+  outlineMoveUp: "Subir sección",
+  outlineMoveDown: "Bajar sección",
+  outlineConflict:
+    "El documento cambió o es de solo lectura. Cancela y abre el esquema de nuevo.",
+  scoreParagraphs: "Puntuaciones de párrafos",
+  scoreHint:
+    "Estimaciones de IA, no estadísticas medidas. Cada solicitud envía solo el párrafo elegido y tus criterios al proveedor configurado. Puede generar cargos.",
+  scoreCriteria: "Criterios",
+  scoreName: "Nombre",
+  scoreInstruction: "Instrucción de evaluación",
+  scoreAdd: "Añadir criterio",
+  scoreRun: "Evaluar párrafo",
+  scoreClarity: "Claridad",
+  scoreEvidence: "Evidencia",
+  scorePersuasion: "Persuasión",
+  scoreAccuracy: "Exactitud estadística",
+  scoreEmpty: "No hay párrafos para evaluar.",
+  workspaceColumns: "Columnas",
+  documentSplit: "Dividir columna del documento",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Activar ${AI_NAME}`,
   textusAiOffHint: "Desactivada: no se envía nada a ningún servicio de IA.",

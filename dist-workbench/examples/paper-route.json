@@ -1,0 +1,39 @@
+{
+  "format": "textus-writing-template",
+  "version": 1,
+  "id": "paper-argument-route",
+  "revision": 1,
+  "components": [],
+  "blocks": [
+    {
+      "id": "block-1",
+      "purpose": "Open with the question and the intended reader\u2019s reason to care.",
+      "components": [],
+      "dependsOn": []
+    },
+    {
+      "id": "block-2",
+      "purpose": "State the claim, its scope, and essential definitions.",
+      "components": [],
+      "dependsOn": ["block-1"]
+    },
+    {
+      "id": "block-3",
+      "purpose": "Present the supporting evidence and explain the reasoning.",
+      "components": [],
+      "dependsOn": ["block-2"]
+    },
+    {
+      "id": "block-4",
+      "purpose": "Engage the strongest objection and state what remains unresolved.",
+      "components": [],
+      "dependsOn": ["block-3"]
+    },
+    {
+      "id": "block-5",
+      "purpose": "Draw a conclusion proportionate to the support and identify the next step.",
+      "components": [],
+      "dependsOn": ["block-4"]
+    }
+  ]
+}
