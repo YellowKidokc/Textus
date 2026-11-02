@@ -1,0 +1,45 @@
+{
+  "format": "textus-review-rubric",
+  "version": 1,
+  "id": "lifecycle-editorial-review",
+  "revision": 1,
+  "name": "Paper lifecycle \u2014 editorial review",
+  "mode": "argument",
+  "instructions": "Review only the supplied text. This rubric adapts selected ideas from the uploaded lifecycle checklist. Distinguish editorial findings from externally verified facts. Do not issue canon rulings, claim formal verification, invent sources, or infer that a checklist item has passed merely because it is mentioned. Return provisional findings with exact quotations and uncertainty.",
+  "criteria": [
+    {
+      "id": "claim-scope",
+      "title": "Claims and scope",
+      "instructions": "Identify central claims and whether their stated scope matches the support visible in the text. Distinguish illustration, analogy and hypothetical examples from evidence.",
+      "scale": null
+    },
+    {
+      "id": "terms",
+      "title": "Definitions and vocabulary",
+      "instructions": "Check whether specialized terms are defined on first use and retain a consistent meaning.",
+      "scale": null
+    },
+    {
+      "id": "reasoning",
+      "title": "Reasoning and objections",
+      "instructions": "Inspect hidden premises, inference gaps, circularity, and whether the strongest relevant objections are engaged. Do not invent an objection merely to fill the rubric.",
+      "scale": null
+    },
+    {
+      "id": "verification",
+      "title": "Verification boundaries",
+      "instructions": "Check whether mathematical, statistical and source-dependent statements distinguish established results from untested or proposed work. External source and proof verification are unavailable in this text-only review.",
+      "scale": null
+    },
+    {
+      "id": "reader-route",
+      "title": "Reader route",
+      "instructions": "Assess whether the opening, section order, transitions and conclusion help the intended reader follow the argument, with a clear distinction between declaration and demonstrated support.",
+      "scale": null
+    }
+  ],
+  "response": {
+    "format": "json",
+    "quoteRequired": true
+  }
+}
