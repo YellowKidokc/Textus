@@ -7,6 +7,8 @@ use tauri::AppHandle;
 
 mod completion;
 mod grammar;
+mod selection;
+pub(crate) use selection::*;
 mod scoring;
 mod scoring_contract;
 pub(crate) use completion::*;

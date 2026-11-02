@@ -1,3 +1,5 @@
+import { rewriteAuditPlugin } from "./favorites/rewrite-audit-plugin";
+import { createFavoriteRewritePlugin } from "./favorites/rewrite-plugin";
 import type { Editor } from "@milkdown/kit/core";
 import { createGhostTextPlugin } from "./writing/ghost-text-plugin";
 import { buildCompletionStyle } from "./writing/completion-style";
@@ -64,6 +66,12 @@ export function withAiPlugins(
   return (
     editor
       .use(blockReader)
+      .use(rewriteAuditPlugin)
+      .use(
+        createFavoriteRewritePlugin(() =>
+          resolveStrings(settings.current.language),
+        ),
+      )
       .use(
         createGhostTextPlugin({
           enabled: () =>

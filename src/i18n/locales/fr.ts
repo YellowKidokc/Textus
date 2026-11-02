@@ -7,6 +7,39 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Modifier les actions favorites",
+  favoriteActions: "Actions favorites",
+  favoriteAdd: "Ajouter une action",
+  favoriteAcademic: "Rendre plus académique",
+  favoriteAcademicPrompt:
+    "Rendez ce passage plus académique et précis. Préservez le sens et les citations sans inventer de preuves.",
+  favoriteShorten: "Raccourcir",
+  favoriteShortenPrompt:
+    "Raccourcissez ce passage sans perdre son sens ni ses nuances importantes.",
+  favoriteHistory: "Historique des réécritures",
+  favoriteHistoryHint:
+    "L’original, chaque version demandée et votre choix final sont conservés. Rejeter une version ne supprime pas son historique.",
+  favoriteHistoryEmpty: "Aucune réécriture enregistrée.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Version",
+  favoritePreviousVersion: "Version précédente",
+  favoriteNextVersion: "Version suivante",
+  favoriteKeep: "Garder cette version",
+  favoriteKept: "Version retenue",
+  favoriteDiscarded: "Rejetée ; original conservé",
+  favoriteUndecided: "Aucun choix final enregistré",
+  favoriteInput: "Entrée",
+  favoriteOutput: "Réécriture",
+  favoriteFailed: "Échec de la demande",
+  favoritePrint: "Imprimer le rapport",
+  favoriteExport: "Exporter le registre complet",
+  favoriteRecorded: "Réécriture enregistrée.",
+  favoriteSaveFailed:
+    "La réécriture ou son historique n’a pas pu être enregistré.",
+  favoriteChanged:
+    "Sélectionnez un passage inchangé qui n’est pas déjà en cours de réécriture.",
+  favoriteEmptyReply: "Le fournisseur a renvoyé une réécriture vide.",
+
   writingTools: "Outils de rédaction",
   outlineArrange: "Réorganiser le plan",
   outlineArrangeHint:

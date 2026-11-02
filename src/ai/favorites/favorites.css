@@ -1,0 +1,153 @@
+.favorite-launcher {
+  position: absolute;
+  bottom: 48px;
+  left: 12px;
+  z-index: 7;
+  display: flex;
+  gap: 4px;
+}
+.favorite-launcher button,
+.favorite-selection-actions button,
+.favorite-dialog button,
+.favorite-version-controls button {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-pill);
+  padding: 4px 12px;
+  font-size: var(--text-caption);
+  cursor: pointer;
+}
+.favorite-selection-actions {
+  position: fixed;
+  z-index: 120;
+  width: 280px;
+  max-width: calc(100vw - 16px);
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-m);
+  padding: 8px;
+}
+.favorite-action-list {
+  max-height: min(40vh, 160px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.favorite-passage {
+  margin-block: 1em !important;
+}
+.favorite-original-outline,
+.favorite-rewrite-text {
+  outline: 1px solid var(--ui-accent);
+  background: var(--ui-surface);
+  border-radius: var(--shape-xs);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.favorite-original-hidden,
+.favorite-block-hidden {
+  display: none !important;
+}
+.favorite-version-controls {
+  user-select: none;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  margin-inline-start: 8px;
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-s);
+  font-size: var(--text-caption);
+  vertical-align: middle;
+}
+.favorite-version-controls button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.favorite-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: var(--ui-bg);
+  overflow: auto;
+}
+.favorite-dialog {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 24px;
+  color: var(--ui-text);
+  font-size: var(--text-body);
+}
+.favorite-dialog header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.favorite-dialog h2 {
+  flex: 1;
+  font-size: var(--text-title);
+}
+.favorite-dialog fieldset {
+  border: 1px solid var(--ui-border);
+  margin-block: 12px;
+  border-radius: var(--shape-m);
+}
+.favorite-dialog label {
+  display: block;
+  margin-block: 8px;
+}
+.favorite-dialog :is(input, textarea) {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  padding: 8px;
+  border-radius: var(--shape-s);
+}
+.favorite-dialog pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: inherit;
+}
+.favorite-history-group {
+  border-block-start: 2px solid var(--ui-border);
+  padding-block: 16px;
+}
+.favorite-history article {
+  padding: 12px;
+  margin-block: 16px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--shape-m);
+}
+.favorite-history-chosen {
+  outline: 2px solid var(--ui-accent);
+}
+.favorite-error {
+  position: fixed;
+  bottom: 48px;
+  left: 12px;
+  max-width: min(560px, 90vw);
+  z-index: 1300;
+  padding: 12px;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+}
+@media (max-width: 700px) {
+  .favorite-launcher {
+    bottom: 88px;
+  }
+  .favorite-dialog {
+    padding: 12px;
+  }
+}

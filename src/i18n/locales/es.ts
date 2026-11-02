@@ -5,6 +5,38 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Editar acciones favoritas",
+  favoriteActions: "Acciones favoritas",
+  favoriteAdd: "Añadir acción",
+  favoriteAcademic: "Hacer más académico",
+  favoriteAcademicPrompt:
+    "Haz este pasaje más académico y preciso. Conserva el significado y las citas sin inventar evidencia.",
+  favoriteShorten: "Acortar",
+  favoriteShortenPrompt:
+    "Acorta este pasaje sin perder su significado ni matices importantes.",
+  favoriteHistory: "Historial de reescrituras",
+  favoriteHistoryHint:
+    "Se conservan el original, cada versión solicitada y la elección final. Descartar una versión no borra su historial.",
+  favoriteHistoryEmpty: "Aún no hay reescrituras registradas.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Versión",
+  favoritePreviousVersion: "Versión anterior",
+  favoriteNextVersion: "Versión siguiente",
+  favoriteKeep: "Conservar esta versión",
+  favoriteKept: "Versión elegida",
+  favoriteDiscarded: "Descartada; original conservado",
+  favoriteUndecided: "Sin elección final registrada",
+  favoriteInput: "Entrada",
+  favoriteOutput: "Reescritura",
+  favoriteFailed: "Solicitud fallida",
+  favoritePrint: "Imprimir informe",
+  favoriteExport: "Exportar registro completo",
+  favoriteRecorded: "Reescritura registrada.",
+  favoriteSaveFailed: "No se pudo guardar la reescritura o su historial.",
+  favoriteChanged:
+    "Selecciona un pasaje sin cambios que no se esté reescribiendo.",
+  favoriteEmptyReply: "El proveedor devolvió una reescritura vacía.",
+
   writingTools: "Herramientas de escritura",
   outlineArrange: "Reorganizar esquema",
   outlineArrangeHint:

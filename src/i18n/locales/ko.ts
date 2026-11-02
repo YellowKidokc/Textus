@@ -5,6 +5,36 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "즐겨찾기 작업 편집",
+  favoriteActions: "즐겨찾기 작업",
+  favoriteAdd: "작업 추가",
+  favoriteAcademic: "학술적으로 다듬기",
+  favoriteAcademicPrompt:
+    "이 글을 더 학술적이고 정확하게 다듬으세요. 의미와 인용을 유지하고 근거를 만들어내지 마세요.",
+  favoriteShorten: "줄이기",
+  favoriteShortenPrompt: "의미와 중요한 단서를 잃지 않도록 이 글을 줄이세요.",
+  favoriteHistory: "재작성 기록",
+  favoriteHistoryHint:
+    "원문, 요청한 모든 버전과 최종 선택을 보관합니다. 재작성을 버려도 기록은 삭제되지 않습니다.",
+  favoriteHistoryEmpty: "아직 재작성 기록이 없습니다.",
+  favoriteOriginal: "원문",
+  favoriteVersions: "버전",
+  favoritePreviousVersion: "이전 버전",
+  favoriteNextVersion: "다음 버전",
+  favoriteKeep: "이 버전 유지",
+  favoriteKept: "선택한 버전",
+  favoriteDiscarded: "버림; 원문 유지",
+  favoriteUndecided: "최종 선택 기록 없음",
+  favoriteInput: "입력",
+  favoriteOutput: "재작성",
+  favoriteFailed: "요청 실패",
+  favoritePrint: "보고서 인쇄",
+  favoriteExport: "전체 기록 내보내기",
+  favoriteRecorded: "재작성을 기록했습니다.",
+  favoriteSaveFailed: "재작성 또는 기록을 저장하지 못했습니다.",
+  favoriteChanged: "변경되지 않았고 재작성 중이 아닌 글을 선택하세요.",
+  favoriteEmptyReply: "제공업체가 빈 재작성을 반환했습니다.",
+
   writingTools: "글쓰기 도구",
   outlineArrange: "개요 재배열",
   outlineArrangeHint:

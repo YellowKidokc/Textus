@@ -15,6 +15,10 @@ const project = { docPath: null, workspaceRoot: null };
 /** Every command that sends something to an AI service. */
 const requests: [string, () => Promise<unknown>][] = [
   [
+    "ai_rewrite_selection",
+    () => ai.rewriteSelection("openai", null, "Selected text", "Shorten"),
+  ],
+  [
     "ai_score_paragraph",
     () =>
       ai.scoreParagraph("openai", null, "Text", [

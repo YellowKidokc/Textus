@@ -6,6 +6,38 @@ import type { Plural } from "../plural";
  * languages fall back to it for what they haven't translated.
  */
 const en = {
+  favoriteManage: "Edit favorite actions",
+  favoriteActions: "Favorite actions",
+  favoriteAdd: "Add action",
+  favoriteAcademic: "Make more academic",
+  favoriteAcademicPrompt:
+    "Make this passage more academic and precise. Preserve meaning and citations; do not invent evidence.",
+  favoriteShorten: "Shorten",
+  favoriteShortenPrompt:
+    "Shorten this passage without losing its meaning or important qualifications.",
+  favoriteHistory: "Rewrite history",
+  favoriteHistoryHint:
+    "The original, every requested version, and your final choice are kept. Discarding a rewrite does not delete its history.",
+  favoriteHistoryEmpty: "No rewrites recorded yet.",
+  favoriteOriginal: "Original",
+  favoriteVersions: "Version",
+  favoritePreviousVersion: "Previous version",
+  favoriteNextVersion: "Next version",
+  favoriteKeep: "Keep this version",
+  favoriteKept: "Kept version",
+  favoriteDiscarded: "Discarded; original kept",
+  favoriteUndecided: "No final choice recorded",
+  favoriteInput: "Input",
+  favoriteOutput: "Rewrite",
+  favoriteFailed: "Request failed",
+  favoritePrint: "Print report",
+  favoriteExport: "Export full record",
+  favoriteRecorded: "Rewrite recorded.",
+  favoriteSaveFailed: "The rewrite or its history could not be saved.",
+  favoriteChanged:
+    "Select an unchanged passage that is not already being rewritten.",
+  favoriteEmptyReply: "The provider returned an empty rewrite.",
+
   writingTools: "Writing tools",
   outlineArrange: "Rearrange outline",
   outlineArrangeHint:

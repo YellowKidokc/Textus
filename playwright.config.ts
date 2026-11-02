@@ -32,6 +32,7 @@ const WEBKIT_SPECS = [
   "user-css.spec.ts",
   "plugins.spec.ts",
   "writing-workspace.spec.ts",
+  "favorite-rewrites.spec.ts",
 ];
 
 export default defineConfig({

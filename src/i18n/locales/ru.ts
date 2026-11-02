@@ -5,6 +5,38 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "Изменить избранные действия",
+  favoriteActions: "Избранные действия",
+  favoriteAdd: "Добавить действие",
+  favoriteAcademic: "Сделать более академичным",
+  favoriteAcademicPrompt:
+    "Сделайте этот фрагмент более академичным и точным. Сохраните смысл и ссылки; не выдумывайте доказательства.",
+  favoriteShorten: "Сократить",
+  favoriteShortenPrompt:
+    "Сократите этот фрагмент без потери смысла и важных оговорок.",
+  favoriteHistory: "История переработок",
+  favoriteHistoryHint:
+    "Сохраняются оригинал, каждая запрошенная версия и окончательный выбор. Отклонение версии не удаляет историю.",
+  favoriteHistoryEmpty: "Переработок пока нет.",
+  favoriteOriginal: "Оригинал",
+  favoriteVersions: "Версия",
+  favoritePreviousVersion: "Предыдущая версия",
+  favoriteNextVersion: "Следующая версия",
+  favoriteKeep: "Оставить эту версию",
+  favoriteKept: "Выбранная версия",
+  favoriteDiscarded: "Отклонено; оригинал сохранён",
+  favoriteUndecided: "Окончательный выбор не записан",
+  favoriteInput: "Входной текст",
+  favoriteOutput: "Переработка",
+  favoriteFailed: "Ошибка запроса",
+  favoritePrint: "Печать отчёта",
+  favoriteExport: "Экспорт всей истории",
+  favoriteRecorded: "Переработка записана.",
+  favoriteSaveFailed: "Не удалось сохранить переработку или её историю.",
+  favoriteChanged:
+    "Выберите неизменённый фрагмент, который ещё не перерабатывается.",
+  favoriteEmptyReply: "Поставщик вернул пустую переработку.",
+
   writingTools: "Инструменты письма",
   outlineArrange: "Перестроить структуру",
   outlineArrangeHint:

@@ -5,6 +5,38 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "お気に入り操作を編集",
+  favoriteActions: "お気に入り操作",
+  favoriteAdd: "操作を追加",
+  favoriteAcademic: "学術的な表現にする",
+  favoriteAcademicPrompt:
+    "この文章を学術的で正確な表現にしてください。意味と引用を保ち、根拠を捏造しないでください。",
+  favoriteShorten: "短くする",
+  favoriteShortenPrompt:
+    "意味や重要な留保を失わずに、この文章を短くしてください。",
+  favoriteHistory: "書き換え履歴",
+  favoriteHistoryHint:
+    "原文、要求した全バージョン、最終的な選択を保存します。書き換えを破棄しても履歴は消えません。",
+  favoriteHistoryEmpty: "書き換えの記録はまだありません。",
+  favoriteOriginal: "原文",
+  favoriteVersions: "バージョン",
+  favoritePreviousVersion: "前のバージョン",
+  favoriteNextVersion: "次のバージョン",
+  favoriteKeep: "このバージョンを採用",
+  favoriteKept: "採用したバージョン",
+  favoriteDiscarded: "破棄、原文を保持",
+  favoriteUndecided: "最終選択の記録なし",
+  favoriteInput: "入力",
+  favoriteOutput: "書き換え",
+  favoriteFailed: "リクエスト失敗",
+  favoritePrint: "レポートを印刷",
+  favoriteExport: "全記録をエクスポート",
+  favoriteRecorded: "書き換えを記録しました。",
+  favoriteSaveFailed: "書き換えまたは履歴を保存できませんでした。",
+  favoriteChanged:
+    "変更されておらず、書き換え中でもない文章を選択してください。",
+  favoriteEmptyReply: "プロバイダーが空の書き換えを返しました。",
+
   writingTools: "執筆ツール",
   outlineArrange: "アウトラインを並べ替え",
   outlineArrangeHint:

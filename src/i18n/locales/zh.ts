@@ -5,6 +5,36 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  favoriteManage: "编辑常用操作",
+  favoriteActions: "常用操作",
+  favoriteAdd: "添加操作",
+  favoriteAcademic: "改为学术表达",
+  favoriteAcademicPrompt:
+    "让这段文字更学术、更精确。保留原意和引用，不要编造证据。",
+  favoriteShorten: "缩短",
+  favoriteShortenPrompt: "缩短这段文字，但保留原意和重要限定条件。",
+  favoriteHistory: "改写历史",
+  favoriteHistoryHint:
+    "保留原文、每次请求的版本和最终选择。放弃改写不会删除历史。",
+  favoriteHistoryEmpty: "尚无改写记录。",
+  favoriteOriginal: "原文",
+  favoriteVersions: "版本",
+  favoritePreviousVersion: "上一版本",
+  favoriteNextVersion: "下一版本",
+  favoriteKeep: "保留此版本",
+  favoriteKept: "已保留版本",
+  favoriteDiscarded: "已放弃，保留原文",
+  favoriteUndecided: "尚无最终选择记录",
+  favoriteInput: "输入",
+  favoriteOutput: "改写",
+  favoriteFailed: "请求失败",
+  favoritePrint: "打印报告",
+  favoriteExport: "导出完整记录",
+  favoriteRecorded: "改写已记录。",
+  favoriteSaveFailed: "无法保存改写或其历史。",
+  favoriteChanged: "请选择未被更改且没有正在改写的文字。",
+  favoriteEmptyReply: "服务商返回了空改写。",
+
   writingTools: "写作工具",
   outlineArrange: "重排大纲",
   outlineArrangeHint:

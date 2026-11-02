@@ -103,6 +103,19 @@ export {
  */
 
 export const ai = {
+  /** Tool-free selection rewrite: ai/client/selection.rs. */
+  rewriteSelection: (
+    provider: string,
+    model: string | null,
+    selection: string,
+    instruction: string,
+  ) =>
+    aiCall<string>("ai_rewrite_selection", {
+      provider,
+      model,
+      selection,
+      instruction,
+    }),
   /** Tool-free scoring; contract: ai/client/scoring.rs. */
   scoreParagraph: (
     provider: string,
