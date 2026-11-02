@@ -11,6 +11,7 @@ import { promises as fs } from "node:fs";
 import process from "node:process";
 import path from "node:path";
 import readline from "node:readline";
+import { parseMethods, parseSeries } from "./methods.mjs";
 
 const ROOT = path.resolve(
   process.argv[2] || process.env.TEXTUS_NOTES_DIR || ".",
@@ -19,6 +20,39 @@ const READ_ONLY = process.env.TEXTUS_NOTES_READ_ONLY === "1";
 const NOTE = /\.(md|markdown|mdx|txt)$/i;
 const MAX_READ = 200_000;
 const MAX_HITS = 100;
+const METHODS_FILE = process.env.TEXTUS_METHODS_FILE || "_methods.md";
+const SERIES_FILE = "_series.md";
+
+async function loadMethods() {
+  try {
+    return parseMethods(await fs.readFile(await inside(METHODS_FILE), "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+/** The nearest _series.md at or above a note's folder. */
+async function findSeries(noteRel) {
+  let dir = path.dirname(await inside(noteRel));
+  for (;;) {
+    const file = path.join(dir, SERIES_FILE);
+    try {
+      return {
+        file: rel(file),
+        ...parseSeries(await fs.readFile(file, "utf8")),
+      };
+    } catch {
+      /* not here */
+    }
+    if (path.resolve(dir) === path.resolve(ROOT)) return null;
+    dir = path.dirname(dir);
+  }
+}
+
+const describe = (m) =>
+  `### ${m.name} (${m.id}, ${m.level})\n` +
+  (m.check ? `Check: ${m.check}\n` : "") +
+  (m.prompt ? `Rewrite: ${m.prompt}\n` : "");
 
 async function inside(rel) {
   if (typeof rel !== "string" || rel === "")
@@ -115,6 +149,41 @@ const tools = {
         if (hits.length >= MAX_HITS) break;
       }
       return hits.join("\n") || "(no matches)";
+    },
+  },
+  list_methods: {
+    description:
+      "List the writing methods in the methods file (_methods.md at the notes root): each has an id, a level (line = check sentence by sentence; shape = title, hook, opening, closing), what to check, and how to rewrite.",
+    inputSchema: { type: "object", properties: {} },
+    async run() {
+      const all = await loadMethods();
+      return (
+        all.map(describe).join("\n") || `(no methods - add ${METHODS_FILE})`
+      );
+    },
+  },
+  get_checklist: {
+    description:
+      "The writing checklist for one note: the methods its series picked (the nearest _series.md above it) and the series outline. Check the note against each method; for line methods quote the sentences that miss, for shape methods offer three options.",
+    inputSchema: {
+      type: "object",
+      properties: { path: { type: "string", description: "The note" } },
+      required: ["path"],
+    },
+    async run({ path: p }) {
+      const series = await findSeries(p);
+      if (!series) return `(no ${SERIES_FILE} above ${p})`;
+      const all = await loadMethods();
+      const picked = series.methods.map(
+        (id) => all.find((m) => m.id === id) || { id, missing: true },
+      );
+      const parts = [`Series: ${series.file}`, ""];
+      for (const m of picked)
+        parts.push(
+          m.missing ? `### ${m.id} - not in ${METHODS_FILE}\n` : describe(m),
+        );
+      if (series.outline.length) parts.push("## Outline", ...series.outline);
+      return parts.join("\n");
     },
   },
   write_note: {
