@@ -39,26 +39,26 @@ test("dragging the sidebar's edge resizes it, and it comes back open at that wid
   await openApp(page);
   await openSidebar(page);
   const handle = page.getByRole("separator", { name: "调整侧边栏宽度" });
-  await expect(handle).toHaveAttribute("aria-valuenow", "240");
-  expect(await sidebarWidth(page)).toBe(240);
+  await expect(handle).toHaveAttribute("aria-valuenow", "360");
+  expect(await sidebarWidth(page)).toBe(360);
 
   await dragHandle(page, 80);
-  await expect(handle).toHaveAttribute("aria-valuenow", "320");
-  expect(await sidebarWidth(page)).toBe(320);
+  await expect(handle).toHaveAttribute("aria-valuenow", "440");
+  expect(await sidebarWidth(page)).toBe(440);
   // The page makes room for it.
-  expect(await mainPaneLeft(page)).toBe(320);
+  expect(await mainPaneLeft(page)).toBe(440);
   await expect
     .poll(() =>
       page.evaluate(() => localStorage.getItem("textus-sidebar-width")),
     )
-    .toBe("320");
+    .toBe("440");
 
   await page.reload();
   await page.waitForSelector('[data-active-tab="true"] .ProseMirror');
   // Left open, it comes back open.
   await expect(page.locator(".sidebar")).not.toHaveClass(/sidebar-collapsed/);
-  expect(await sidebarWidth(page)).toBe(320);
-  expect(await mainPaneLeft(page)).toBe(320);
+  expect(await sidebarWidth(page)).toBe(440);
+  expect(await mainPaneLeft(page)).toBe(440);
 });
 
 test("the sidebar resizes from the keyboard within its bounds, and resets on a double click", async ({
@@ -74,17 +74,17 @@ test("the sidebar resizes from the keyboard within its bounds, and resets on a d
   await handle.focus();
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowRight");
-  await expect(handle).toHaveAttribute("aria-valuenow", "280");
-  expect(await sidebarWidth(page)).toBe(280);
+  await expect(handle).toHaveAttribute("aria-valuenow", "400");
+  expect(await sidebarWidth(page)).toBe(400);
   await page.keyboard.press("ArrowLeft");
-  await expect(handle).toHaveAttribute("aria-valuenow", "260");
+  await expect(handle).toHaveAttribute("aria-valuenow", "380");
   expect(
     await page.evaluate(() => localStorage.getItem("textus-sidebar-width")),
-  ).toBe("260");
+  ).toBe("380");
 
   await handle.dblclick();
-  await expect(handle).toHaveAttribute("aria-valuenow", "240");
-  expect(await sidebarWidth(page)).toBe(240);
+  await expect(handle).toHaveAttribute("aria-valuenow", "360");
+  expect(await sidebarWidth(page)).toBe(360);
 
   // Nor can a drag take it past those bounds.
   await dragHandle(page, 900);

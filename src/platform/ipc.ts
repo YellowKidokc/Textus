@@ -103,6 +103,17 @@ export {
  */
 
 export const ai = {
+  /** Tool-free scoring; contract: ai/client/scoring.rs. */
+  scoreParagraph: (
+    provider: string,
+    model: string | null,
+    paragraph: string,
+    criteria: import("../ai/paragraph-scores").ScoreCriterion[],
+  ) =>
+    aiCall<import("../ai/paragraph-scores").ParagraphScore[]>(
+      "ai_score_paragraph",
+      { provider, model, paragraph, criteria },
+    ),
   // Rust sends the dialect and auth methods as plain strings from fixed sets.
   listProviders: () =>
     command("list_providers") as Promise<ProviderCatalogEntry[]>,

@@ -5,6 +5,31 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "Ferramentas de escrita",
+  outlineArrange: "Reorganizar estrutura",
+  outlineArrangeHint:
+    "Mova títulos com seus parágrafos e subseções. O texto fica bloqueado até aplicar ou cancelar. Arraste um título ou use as setas.",
+  outlineLevels: "Níveis de título",
+  outlineMoveUp: "Subir seção",
+  outlineMoveDown: "Descer seção",
+  outlineConflict:
+    "O documento mudou ou está em modo de leitura. Cancele e reabra a estrutura.",
+  scoreParagraphs: "Notas dos parágrafos",
+  scoreHint:
+    "Estimativas de IA, não estatísticas medidas. Cada pedido envia apenas o parágrafo selecionado e seus critérios ao provedor configurado. Pode haver cobrança.",
+  scoreCriteria: "Critérios",
+  scoreName: "Nome",
+  scoreInstruction: "Instrução de avaliação",
+  scoreAdd: "Adicionar critério",
+  scoreRun: "Avaliar parágrafo",
+  scoreClarity: "Clareza",
+  scoreEvidence: "Evidências",
+  scorePersuasion: "Persuasão",
+  scoreAccuracy: "Precisão estatística",
+  scoreEmpty: "Nenhum parágrafo para avaliar.",
+  workspaceColumns: "Colunas",
+  documentSplit: "Dividir coluna do documento",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Ativar ${AI_NAME}`,
   textusAiOffHint: "Desativada: nada é enviado a nenhum serviço de IA.",

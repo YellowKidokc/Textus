@@ -39,6 +39,8 @@ export interface PluginTabInfo {
 
 /** The document in front, as its editor reads it. */
 export interface ActiveDocumentAccess {
+  /** Atomic workspace replacement, refused if the source changed. */
+  replaceText?(expected: string, next: string): boolean;
   path: string | null;
   text(): string;
   /** Its blocks as Textus AI is shown them: what an edit names by `block`. */

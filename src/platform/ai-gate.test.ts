@@ -14,6 +14,13 @@ const project = { docPath: null, workspaceRoot: null };
 
 /** Every command that sends something to an AI service. */
 const requests: [string, () => Promise<unknown>][] = [
+  [
+    "ai_score_paragraph",
+    () =>
+      ai.scoreParagraph("openai", null, "Text", [
+        { name: "Clarity", instruction: "Clear prose" },
+      ]),
+  ],
   ["ai_complete", () => ai.complete("openai", "a", "", null, null)],
   ["ai_grammar_check", () => ai.grammarCheck("openai", "a", null, null)],
   [

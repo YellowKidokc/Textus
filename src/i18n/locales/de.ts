@@ -5,6 +5,31 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "Schreibwerkzeuge",
+  outlineArrange: "Gliederung umordnen",
+  outlineArrangeHint:
+    "Verschiebe Überschriften mit ihren Absätzen und Unterabschnitten. Der Text bleibt bis zum Anwenden oder Abbrechen gesperrt. Ziehe eine Überschrift oder nutze die Pfeiltasten.",
+  outlineLevels: "Überschriftenebenen",
+  outlineMoveUp: "Abschnitt nach oben",
+  outlineMoveDown: "Abschnitt nach unten",
+  outlineConflict:
+    "Das Dokument wurde geändert oder ist schreibgeschützt. Abbrechen und Gliederung erneut öffnen.",
+  scoreParagraphs: "Absatzbewertungen",
+  scoreHint:
+    "KI-Schätzungen, keine gemessenen Statistiken. Jede Anfrage sendet nur den gewählten Absatz und deine Kriterien an den eingerichteten Anbieter. Es können Kosten entstehen.",
+  scoreCriteria: "Kriterien",
+  scoreName: "Name",
+  scoreInstruction: "Bewertungsanweisung",
+  scoreAdd: "Kriterium hinzufügen",
+  scoreRun: "Absatz bewerten",
+  scoreClarity: "Klarheit",
+  scoreEvidence: "Belege",
+  scorePersuasion: "Überzeugungskraft",
+  scoreAccuracy: "Statistische Genauigkeit",
+  scoreEmpty: "Keine Absätze zu bewerten.",
+  workspaceColumns: "Spalten",
+  documentSplit: "Dokumentspalte teilen",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `${AI_NAME} aktivieren`,
   textusAiOffHint: "Aus: Es wird nichts an einen KI-Dienst gesendet.",

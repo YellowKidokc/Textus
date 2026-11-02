@@ -282,6 +282,7 @@ pub fn run() {
             claude_auth_status,
             claude_logout,
             ai_complete,
+            ai::client::ai_score_paragraph,
             ai_grammar_check,
             ai_agent_message,
             ai_cancel,

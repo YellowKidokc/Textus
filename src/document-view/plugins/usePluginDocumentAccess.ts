@@ -56,6 +56,16 @@ export function usePluginDocumentAccess({
     if (!isActive) return;
     const access: ActiveDocumentAccess = {
       path: filePath,
+      replaceText: (expected, next) =>
+        run((ctx) => {
+          const view = ctx.get(editorViewCtx);
+          if (
+            !view.editable ||
+            cachedDocument(ctx, view.state.doc).markdown !== expected
+          )
+            return false;
+          return replaceDocument(ctx, next);
+        }) ?? false,
       text: () =>
         run(
           (ctx) =>

@@ -5,6 +5,31 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "글쓰기 도구",
+  outlineArrange: "개요 재배열",
+  outlineArrangeHint:
+    "제목과 해당 문단 및 하위 절을 함께 이동합니다. 적용하거나 취소할 때까지 본문은 잠깁니다. 제목을 끌거나 화살표 버튼을 사용하세요.",
+  outlineLevels: "제목 수준",
+  outlineMoveUp: "절 위로 이동",
+  outlineMoveDown: "절 아래로 이동",
+  outlineConflict:
+    "문서가 변경되었거나 읽기 전용입니다. 취소한 뒤 개요를 다시 여세요.",
+  scoreParagraphs: "문단 점수",
+  scoreHint:
+    "AI 추정치이며 측정된 통계가 아닙니다. 선택한 문단과 평가 기준만 설정된 AI 제공업체에 전송됩니다. 요금이 발생할 수 있습니다.",
+  scoreCriteria: "평가 기준",
+  scoreName: "이름",
+  scoreInstruction: "평가 지침",
+  scoreAdd: "기준 추가",
+  scoreRun: "문단 평가",
+  scoreClarity: "명확성",
+  scoreEvidence: "근거",
+  scorePersuasion: "설득력",
+  scoreAccuracy: "통계적 정확성",
+  scoreEmpty: "평가할 문단이 없습니다.",
+  workspaceColumns: "열 수",
+  documentSplit: "문서 열 분할",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `${AI_NAME} 사용`,
   textusAiOffHint:

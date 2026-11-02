@@ -7,6 +7,31 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "Outils de rédaction",
+  outlineArrange: "Réorganiser le plan",
+  outlineArrangeHint:
+    "Déplacez les titres avec leurs paragraphes et sous-sections. Le texte reste verrouillé jusqu’à validation ou annulation. Glissez un titre ou utilisez les flèches.",
+  outlineLevels: "Niveaux de titre",
+  outlineMoveUp: "Monter la section",
+  outlineMoveDown: "Descendre la section",
+  outlineConflict:
+    "Le document a changé ou est en lecture seule. Annulez et rouvrez le plan.",
+  scoreParagraphs: "Notes des paragraphes",
+  scoreHint:
+    "Estimations de l’IA, pas des statistiques mesurées. Chaque demande envoie seulement le paragraphe choisi et vos critères au fournisseur configuré. Des frais peuvent s’appliquer.",
+  scoreCriteria: "Critères",
+  scoreName: "Nom",
+  scoreInstruction: "Consigne de notation",
+  scoreAdd: "Ajouter un critère",
+  scoreRun: "Évaluer le paragraphe",
+  scoreClarity: "Clarté",
+  scoreEvidence: "Preuves",
+  scorePersuasion: "Persuasion",
+  scoreAccuracy: "Exactitude statistique",
+  scoreEmpty: "Aucun paragraphe à évaluer.",
+  workspaceColumns: "Colonnes",
+  documentSplit: "Diviser la colonne du document",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Activer ${AI_NAME}`,
   textusAiOffHint: "Désactivée : rien n'est envoyé à aucun service d'IA.",

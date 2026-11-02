@@ -36,6 +36,11 @@ import { copyPathItem } from "../clipboard/copy-path";
 type TabBarProps = ComponentProps<typeof TabBar>;
 
 // Its Markdown renderer loads when a tab first shows it, not with the window.
+const WritingTools = lazyComponent(
+  lazyModule("writing-tools", () => import("./writing/WritingTools")),
+  (m) => m.WritingTools,
+);
+
 const SplitView = lazyComponent(
   lazyModule("split-view", () => import("../editor/modes/SplitView")),
   (m) => m.SplitView,
@@ -218,6 +223,12 @@ export function MainPane({
       data-split={split?.root.direction}
       style={grid?.column}
     >
+      <Suspense fallback={null}>
+        <WritingTools
+          tab={byId.get(activeTabId) ?? tabs[0]}
+          onChange={onChange}
+        />
+      </Suspense>
       {split && grid
         ? panes.map((p) =>
             tabBar(

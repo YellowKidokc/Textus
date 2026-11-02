@@ -5,6 +5,31 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "執筆ツール",
+  outlineArrange: "アウトラインを並べ替え",
+  outlineArrangeHint:
+    "見出しを段落や小見出しと一緒に移動します。適用またはキャンセルまで本文はロックされます。見出しをドラッグするか矢印ボタンを使ってください。",
+  outlineLevels: "見出しレベル",
+  outlineMoveUp: "節を上へ",
+  outlineMoveDown: "節を下へ",
+  outlineConflict:
+    "文書が変更されたか読み取り専用です。キャンセルして再度開いてください。",
+  scoreParagraphs: "段落の評価",
+  scoreHint:
+    "AI による推定であり、実測の統計ではありません。選択した段落と評価基準だけを設定済みの AI プロバイダーに送信します。料金が発生する場合があります。",
+  scoreCriteria: "評価基準",
+  scoreName: "名前",
+  scoreInstruction: "評価の指示",
+  scoreAdd: "基準を追加",
+  scoreRun: "段落を評価",
+  scoreClarity: "明確さ",
+  scoreEvidence: "根拠",
+  scorePersuasion: "説得力",
+  scoreAccuracy: "統計の正確さ",
+  scoreEmpty: "評価する段落がありません。",
+  workspaceColumns: "列数",
+  documentSplit: "文書の列を分割",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `${AI_NAME} を有効にする`,
   textusAiOffHint: "オフの間は、どの AI サービスにも何も送信しません。",

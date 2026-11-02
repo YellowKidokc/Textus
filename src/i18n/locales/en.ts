@@ -6,6 +6,31 @@ import type { Plural } from "../plural";
  * languages fall back to it for what they haven't translated.
  */
 const en = {
+  writingTools: "Writing tools",
+  outlineArrange: "Rearrange outline",
+  outlineArrangeHint:
+    "Move headings with all their paragraphs and subsections. Body text is locked until you apply or cancel. Drag a heading before another, or use the arrow buttons.",
+  outlineLevels: "Heading levels",
+  outlineMoveUp: "Move section up",
+  outlineMoveDown: "Move section down",
+  outlineConflict:
+    "The document changed or is read-only. Cancel and reopen the outline.",
+  scoreParagraphs: "Paragraph scores",
+  scoreHint:
+    "AI estimates, not measured statistics. Each run sends only the selected paragraph and your criteria to your configured AI provider. Calls may incur charges.",
+  scoreCriteria: "Criteria",
+  scoreName: "Name",
+  scoreInstruction: "Scoring instruction",
+  scoreAdd: "Add criterion",
+  scoreRun: "Score paragraph",
+  scoreClarity: "Clarity",
+  scoreEvidence: "Evidence",
+  scorePersuasion: "Persuasion",
+  scoreAccuracy: "Statistical accuracy",
+  scoreEmpty: "No paragraphs to score.",
+  workspaceColumns: "Columns",
+  documentSplit: "Split document column",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `Enable ${AI_NAME}`,
   textusAiOffHint: "Off: nothing is sent to any AI service.",

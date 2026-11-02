@@ -3,7 +3,7 @@ import { getUiState, setUiState } from "../storage/ui-state";
 
 /** The sidebar's width as it comes, and the narrowest it can be dragged to:
  *  under this the tree's names are cut to a few letters. */
-export const SIDEBAR_DEFAULT_WIDTH = 240;
+export const SIDEBAR_DEFAULT_WIDTH = 360;
 export const SIDEBAR_MIN_WIDTH = 180;
 /** The widest it can be dragged to, and the share of a small window it may
  *  take. */

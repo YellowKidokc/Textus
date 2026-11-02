@@ -5,6 +5,30 @@ import type { Translation } from "../strings";
 export const complete = true;
 
 export default {
+  writingTools: "寫作工具",
+  outlineArrange: "重排大綱",
+  outlineArrangeHint:
+    "連同段落和子章節一起移動標題。套用或取消前正文將被鎖定。拖曳標題到另一標題前，或使用箭頭按鈕。",
+  outlineLevels: "標題層級",
+  outlineMoveUp: "上移章節",
+  outlineMoveDown: "下移章節",
+  outlineConflict: "文件已變更或為唯讀。請取消後重新開啟大綱。",
+  scoreParagraphs: "段落評分",
+  scoreHint:
+    "這是 AI 估計，並非實測統計資料。每次僅將所選段落和評分標準傳送給已設定的 AI 服務商，可能產生費用。",
+  scoreCriteria: "評分標準",
+  scoreName: "名稱",
+  scoreInstruction: "評分指令",
+  scoreAdd: "新增標準",
+  scoreRun: "評估段落",
+  scoreClarity: "清晰度",
+  scoreEvidence: "證據",
+  scorePersuasion: "說服力",
+  scoreAccuracy: "統計準確性",
+  scoreEmpty: "沒有可評分的段落。",
+  workspaceColumns: "欄數",
+  documentSplit: "分割文件欄",
+
   agentPanelTitle: AI_NAME,
   textusAiToggleLabel: `啟用 ${AI_NAME}`,
   textusAiOffHint: "已關閉：不會向任何 AI 服務傳送內容。",
